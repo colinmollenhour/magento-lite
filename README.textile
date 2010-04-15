@@ -1,0 +1,3 @@
+h1. Magento Lite
+
+This repository contains a stripped down version of Magento which is meant to serve as a more general purpose framework. Therefore, all functionality relating to shopping carts will be removed. The licensing will not be changed (OSL/AFL).
