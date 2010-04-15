@@ -1,0 +1,103 @@
+<?php
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category    design
+ * @package     default_default
+ * @copyright   Copyright (c) 2009 Irubin Consulting Inc. DBA Varien (http://www.varien.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+?>
+<script type="text/javascript">
+<!--
+<?php $myBlock = $this->getLayout()->getBlock('roleUsersGrid'); ?>
+<?php if( is_object($myBlock) && $myBlock->getJsObjectName() ): ?>
+    var checkBoxes = $H({});
+    var warning = false;
+    var inRoleUsers = $H(<?php echo $myBlock->_getUsers(true) ?>);
+    if (inRoleUsers.size() > 0) warning = true;
+    $('in_role_user').value = inRoleUsers.toQueryString();
+
+    function registerUserRole(grid, element, checked){
+        if(checked){
+            inRoleUsers[element.value] = 0;
+        } else {
+            inRoleUsers.remove(element.value);
+        }
+        $('in_role_user').value = inRoleUsers.toQueryString();
+        grid.reloadParams = {'in_role_user[]':inRoleUsers.keys()};
+    }
+
+    function roleUsersRowClick(grid, event){
+        var trElement = Event.findElement(event, 'tr');
+        var isInput   = Event.element(event).tagName == 'INPUT';
+        if(trElement){
+            var checkbox = Element.getElementsBySelector(trElement, 'input');
+            if(checkbox[0]){
+                var checked = isInput ? checkbox[0].checked : !checkbox[0].checked;
+                if (warning && checkBoxes.size() > 0) {
+                    if ( !confirm("<?php echo $this->__('Warning!\r\nThis action will remove this user from already assigned role\r\nAre you sure?') ?>") ) {
+                        checkbox[0].checked = false;
+                        for(i in checkBoxes) {
+                            if( checkBoxes[i].status == 1) {
+                                checkBoxes[i].object.checked = true;
+                            }
+                        }
+                        return false;
+                    }
+                    warning = false;
+                }
+                <?php echo $myBlock->getJsObjectName() ?>.setCheckboxChecked(checkbox[0], checked);
+            }
+        }
+    }
+
+    function roleUsersRowInit(grid, row){
+        var checkbox = $(row).getElementsByClassName('checkbox')[0];
+        if (checkbox) {
+            checkBoxes[checkbox.value] = {'status' : ((checkbox.checked) ? 1 : 0), 'object' : checkbox};
+        }
+    }
+
+    function myhandler(o)
+    {
+        if (checkBoxes.size() > 0) {
+            if ( !confirm("<?php echo $this->__('Warning!\r\nThis action will remove those users from already assigned roles\r\nAre you sure?') ?>") ) {
+                o.checked = false;
+                for(i in checkBoxes) {
+                    if( checkBoxes[i].status == 1) {
+                        checkBoxes[i].object.checked = true;
+                    }
+                }
+                return false;
+            }
+            warning = false;
+        }
+        for(i in checkBoxes) <?php echo $myBlock->getJsObjectName() ?>.setCheckboxChecked(checkBoxes[i].object, o.checked);
+    }
+
+<?php echo $myBlock->getJsObjectName() ?>.rowClickCallback = roleUsersRowClick;
+<?php echo $myBlock->getJsObjectName() ?>.initRowCallback = roleUsersRowInit;
+<?php echo $myBlock->getJsObjectName() ?>.checkboxCheckCallback = registerUserRole;
+<?php echo $myBlock->getJsObjectName() ?>.checkCheckboxes = myhandler;
+<?php echo $myBlock->getJsObjectName() ?>.rows.each(function(row){roleUsersRowInit(<?php echo $myBlock->getJsObjectName() ?>, row)});
+    $('in_role_user_old').value = $('in_role_user').value;
+<?php endif; ?>
+//-->
+</script>
