@@ -31,13 +31,20 @@
             <active>true</active>
             <codePool>core</codePool>
         </Mage_Core>
-        <Mage_Eav>
+        <Mage_Directory>
             <active>true</active>
             <codePool>core</codePool>
             <depends>
                 <Mage_Core />
             </depends>
-        </Mage_Eav>
+        </Mage_Directory>
+        <Mage_Dataflow>
+            <active>true</active>
+            <codePool>core</codePool>
+            <depends>
+                <Mage_Core />
+            </depends>
+        </Mage_Dataflow>
         <Mage_Page>
             <active>true</active>
             <codePool>core</codePool>
@@ -73,20 +80,6 @@
                 <Mage_Core />
             </depends>
         </Mage_Cron>
-        <Mage_Directory>
-            <active>true</active>
-            <codePool>core</codePool>
-            <depends>
-                <Mage_Core />
-            </depends>
-        </Mage_Directory>
-        <Mage_Backup>
-            <active>true</active>
-            <codePool>core</codePool>
-            <depends>
-                <Mage_Core />
-            </depends>
-        </Mage_Backup>
         <Mage_Cms>
             <active>true</active>
             <codePool>core</codePool>
@@ -94,33 +87,5 @@
                 <Mage_Core/>
             </depends>
         </Mage_Cms>
-        <Mage_Media>
-            <active>true</active>
-            <codePool>core</codePool>
-            <depends>
-                <Mage_Core />
-             </depends>
-        </Mage_Media>
-        <Mage_Dataflow>
-            <active>true</active>
-            <codePool>core</codePool>
-            <depends>
-                <Mage_Core />
-            </depends>
-        </Mage_Dataflow>
-        <Mage_Index>
-            <active>true</active>
-            <codePool>core</codePool>
-            <depends>
-                <Mage_Core/>
-            </depends>
-        </Mage_Index>
-        <Mage_Compiler>
-            <active>true</active>
-            <codePool>community</codePool>
-            <depends>
-                <Mage_Core />
-            </depends>
-        </Mage_Compiler>
     </modules>
 </config>
