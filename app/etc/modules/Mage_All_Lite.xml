@@ -115,5 +115,12 @@
                 <Mage_Core/>
             </depends>
         </Mage_Index>
+        <Mage_Compiler>
+            <active>true</active>
+            <codePool>community</codePool>
+            <depends>
+                <Mage_Core />
+            </depends>
+        </Mage_Compiler>
     </modules>
 </config>

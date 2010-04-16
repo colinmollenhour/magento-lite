@@ -1,0 +1,159 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Magento
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE_AFL.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@magentocommerce.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade Magento to newer
+ * versions in the future. If you wish to customize Magento for your
+ * needs please refer to http://www.magentocommerce.com for more information.
+ *
+ * @category    Mage
+ * @package     Mage_Compiler
+ * @copyright   Copyright (c) 2009 Irubin Consulting Inc. DBA Varien (http://www.varien.com)
+ * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ */
+-->
+<config>
+    <includes>
+        <default>
+            <Zend_Db_Statement_Pdo/>
+
+            <Zend_Loader/>
+            <Zend_Json/>
+            <Zend_Filter_Interface/>
+
+            <Zend_Db_Statement_Interface/>
+            <Zend_Db_Statement/>
+            <Zend_Db_Select/>
+            <Zend_Db_Profiler/>
+            <Zend_Db_Expr/>
+            <Zend_Db_Adapter_Pdo_Mysql/>
+            <Zend_Db_Adapter_Pdo_Abstract/>
+            <Zend_Db_Adapter_Abstract/>
+            <Zend_Db/>
+            <Zend_Controller_Response_Http/>
+            <Zend_Controller_Response_Abstract/>
+            <Zend_Controller_Request_Http/>
+            <Zend_Controller_Request_Abstract/>
+            <Zend_Cache_Core/>
+            <Zend_Cache_Backend_Interface/>
+            <Zend_Cache_Backend/>
+            <Zend_Cache/>
+
+            <Varien_Simplexml_Element/>
+            <Varien_Simplexml_Config/>
+            <Varien_Object/>
+            <Varien_Filter_Template_Tokenizer_Parameter/>
+            <Varien_Filter_Template_Tokenizer_Abstract/>
+            <Varien_Filter_Template/>
+            <Varien_Event_Observer_Collection/>
+            <Varien_Event_Observer/>
+            <Varien_Event_Collection/>
+            <Varien_Event/>
+            <Varien_Db_Select/>
+            <Varien_Db_Adapter_Pdo_Mysql/>
+            <Varien_Data_Collection_Db/>
+            <Varien_Data_Collection/>
+
+            <Mage_Page_Block_Template_Links/>
+            <Mage_Page_Block_Switch/>
+            <Mage_Page_Block_Html_Header/>
+            <Mage_Page_Block_Html_Head/>
+            <Mage_Page_Block_Html_Footer/>
+            <Mage_Page_Block_Html_Breadcrumbs/>
+            <Mage_Page_Block_Html/>
+
+            <Mage_Cms_Model_Page/>
+            <Mage_Cms_Model_Mysql4_Page/>
+            <Mage_Cms_Model_Block/>
+            <Mage_Cms_Helper_Page/>
+            <Mage_Cms_Controller_Router/>
+            <Mage_Cms_Block_Page/>
+            <Mage_Cms_Block_Block/>
+
+            <Mage_Core_Model_Website/>
+            <Mage_Core_Model_Url_Rewrite/>
+            <Mage_Core_Model_Url/>
+            <Mage_Core_Model_Translate_Inline/>
+            <Mage_Core_Model_Translate_Expr/>
+            <Mage_Core_Model_Translate/>
+            <Mage_Core_Model_Store_Group/>
+            <Mage_Core_Model_Store/>
+            <Mage_Core_Model_Session_Abstract_Varien/>
+            <Mage_Core_Model_Session_Abstract/>
+            <Mage_Core_Model_Session/>
+            <Mage_Core_Model_Resource_Type_Db_Pdo_Mysql/>
+            <Mage_Core_Model_Resource_Type_Db/>
+            <Mage_Core_Model_Resource_Type_Abstract/>
+            <Mage_Core_Model_Resource_Abstract/>
+            <Mage_Core_Model_Resource/>
+            <Mage_Core_Model_Mysql4_Website_Collection/>
+            <Mage_Core_Model_Mysql4_Website/>
+            <Mage_Core_Model_Mysql4_Url_Rewrite/>
+            <Mage_Core_Model_Mysql4_Store_Group_Collection/>
+            <Mage_Core_Model_Mysql4_Store_Group/>
+            <Mage_Core_Model_Mysql4_Store_Collection/>
+            <Mage_Core_Model_Mysql4_Store/>
+            <Mage_Core_Model_Mysql4_Design/>
+            <Mage_Core_Model_Mysql4_Collection_Abstract/>
+            <Mage_Core_Model_Mysql4_Abstract/>
+            <Mage_Core_Model_Message_Collection/>
+            <Mage_Core_Model_Message/>
+            <Mage_Core_Model_Locale/>
+            <Mage_Core_Model_Layout_Update/>
+            <Mage_Core_Model_Layout_Element/>
+            <Mage_Core_Model_Layout/>
+            <Mage_Core_Model_Email_Template_Filter/>
+            <Mage_Core_Model_Design_Package/>
+            <Mage_Core_Model_Design/>
+            <Mage_Core_Model_Cookie/>
+            <Mage_Core_Model_Config_Options/>
+            <Mage_Core_Model_Config_Element/>
+            <Mage_Core_Model_Config_Data/>
+            <Mage_Core_Model_Config_Base/>
+            <Mage_Core_Model_Config/>
+            <Mage_Core_Model_App_Area/>
+            <Mage_Core_Model_App/>
+            <Mage_Core_Model_Abstract/>
+            <Mage_Core_Helper_Url/>
+            <Mage_Core_Helper_String/>
+            <Mage_Core_Helper_Js/>
+            <Mage_Core_Helper_Data/>
+            <Mage_Core_Helper_Abstract/>
+            <Mage_Core_Controller_Varien_Router_Standard/>
+            <Mage_Core_Controller_Varien_Router_Default/>
+            <Mage_Core_Controller_Varien_Router_Admin/>
+            <Mage_Core_Controller_Varien_Router_Abstract/>
+            <Mage_Core_Controller_Varien_Front/>
+            <Mage_Core_Controller_Varien_Action/>
+            <Mage_Core_Controller_Response_Http/>
+            <Mage_Core_Controller_Request_Http/>
+            <Mage_Core_Controller_Front_Action/>
+            <Mage_Core_Block_Text_List/>
+            <Mage_Core_Block_Text/>
+            <Mage_Core_Block_Template/>
+            <Mage_Core_Block_Profiler/>
+            <Mage_Core_Block_Messages/>
+            <Mage_Core_Block_Abstract/>
+        </default>
+
+        <cms>
+            <Mage_Page_Helper_Data/>
+            <Mage_Page_Helper_Layout/>
+            <Mage_Page_Model_Config/>
+        </cms>
+
+    </includes>
+</config>
