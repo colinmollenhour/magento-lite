@@ -24,6 +24,18 @@
     
   </global>
 
+  <admin>
+    <routers>
+      <adminhtml>
+        <args>
+          <modules>
+            <magelite before="Mage_Adminhtml">Mage_Lite</magelite>
+          </modules>
+        </args>
+      </adminhtml>
+    </routers>
+  </admin>
+
   <!-- set default admin theme to make some overrides -->
   <stores>
     <admin>

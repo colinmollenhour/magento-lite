@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!--
+@TODO License
+
+Add back URL Rewrite Management (from Mage_Catalog)
+-->
+<config>
+    <menu>
+        <cms>
+            <children>
+                <urlrewrite translate="title" module="cms">
+                    <title>URL Rewrite Management</title>
+                    <action>adminhtml/urlrewrite/index</action>
+                    <sort_order>30</sort_order>
+                </urlrewrite>
+            </children>
+        </cms>
+    </menu>
+    <acl>
+        <resources>
+            <admin>
+                <children>
+                    <cms translate="title" module="cms">
+                        <children>
+                            <urlrewrite translate="title">
+                                <title>Url Rewrite Management</title>
+                            </urlrewrite>
+                        </children>
+                    </cms>
+                </children>
+            </admin>
+        </resources>
+    </acl>
+</config>
