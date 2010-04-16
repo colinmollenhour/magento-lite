@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+  <modules>
+    <Mage_Lite>
+      <version>0.1.0</version>
+    </Mage_Lite>
+  </modules>
+
+  <global>
+
+    <helpers>
+      <!-- satisfy usage of legacy helpers in various places -->
+      <catalog><rewrite><data>Mage_Core_Helper_Data</data></rewrite></catalog>
+      <catalogrule><rewrite><data>Mage_Core_Helper_Data</data></rewrite></catalogrule>
+    </helpers>
+
+    <resources>
+      <magelite_setup>
+        <setup>
+          <module>Mage_Lite</module>
+        </setup>
+      </magelite_setup>
+    </resources>
+    
+  </global>
+
+  <!-- set default admin theme to make some overrides -->
+  <stores>
+    <admin>
+      <design>
+       <theme>
+          <default>magelite</default>
+        </theme>
+      </design>
+    </admin>
+  </stores>
+</config>

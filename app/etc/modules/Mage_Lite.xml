@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+@TODO License
+-->
+<config>
+    <modules>
+        <Mage_Lite>
+            <active>true</active>
+            <codePool>community</codePool>
+            <depends>
+                <Mage_Core />
+                <Mage_Eav />
+                <Mage_Page />
+                <Mage_Install />
+                <Mage_Admin />
+                <Mage_Adminhtml />
+                <Mage_Cron />
+                <Mage_Directory />
+                <Mage_Backup />
+                <Mage_Cms />
+                <Mage_Media />
+                <Mage_Dataflow />
+                <Mage_Index />
+            </depends>
+        </Mage_Lite>
+    </modules>
+</config>
