@@ -87,5 +87,12 @@
                 <Mage_Core/>
             </depends>
         </Mage_Cms>
+        <Mage_Widget>
+            <active>false</active>
+            <codePool>core</codePool>
+            <depends>
+                <Mage_Cms />
+            </depends>
+        </Mage_Widget>
     </modules>
 </config>
