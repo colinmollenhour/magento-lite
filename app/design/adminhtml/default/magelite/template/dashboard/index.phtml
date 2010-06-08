@@ -25,67 +25,6 @@
  */
 ?>
 
-<script type="text/javascript">
-//<![CDATA[
-function changeDiagramsPeriod(periodObj) {
-    periodParam = periodObj.value ? 'period/' + periodObj.value + '/' : '';
-<?php foreach ($this->getChild('diagrams')->getTabsIds() as $tabId): ?>
-    ajaxBlockParam = 'block/tab_<?php echo $tabId ?>/';
-    ajaxBlockUrl = '<?php echo $this->getUrl('*/*/ajaxBlock', array('_current' => true, 'block' => '', 'period' => '')) ?>' + ajaxBlockParam + periodParam;
-    new Ajax.Request(ajaxBlockUrl, {
-        parameters: {isAjax: 'true', form_key: FORM_KEY},
-        onSuccess: function(transport) {
-            tabContentElementId = '<?php echo $this->getChild('diagrams')->getId() ?>_<?php echo $tabId ?>_content';
-            try {
-                if (transport.responseText.isJSON()) {
-                    var response = transport.responseText.evalJSON()
-                    if (response.error) {
-                        alert(response.message);
-                    }
-                    if(response.ajaxExpired && response.ajaxRedirect) {
-                        setLocation(response.ajaxRedirect);
-                    }
-                } else {
-                    $(tabContentElementId).update(transport.responseText);
-                }
-            }
-            catch (e) {
-                $(tabContentElementId).update(transport.responseText);
-            }
-        }
-    });
-<?php endforeach; ?>
-    ajaxBlockUrl = '<?php echo $this->getUrl('*/*/ajaxBlock', array('_current' => true, 'block' => 'totals', 'period' => '')) ?>' + periodParam;
-    new Ajax.Request(ajaxBlockUrl, {
-        parameters: {isAjax: 'true', form_key: FORM_KEY},
-        onSuccess: function(transport) {
-            tabContentElementId = 'dashboard_diagram_totals';
-            try {
-                if (transport.responseText.isJSON()) {
-                    var response = transport.responseText.evalJSON()
-                    if (response.error) {
-                        alert(response.message);
-                    }
-                    if(response.ajaxExpired && response.ajaxRedirect) {
-                        setLocation(response.ajaxRedirect);
-                    }
-                } else {
-                    $(tabContentElementId).replace(transport.responseText);
-                }
-            }
-            catch (e) {
-                $(tabContentElementId).replace(transport.responseText);
-            }
-        }
-    });
-}
-
-function toggleCal(id) {
-    $('dashboard_'+id+'_cal_div').toggle();
-    $('dashboard_'+id+'_range_div').toggle();
-}
-//]]>
-</script>
 <div class="content-header">
     <table cellspacing="0">
         <tr>
