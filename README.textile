@@ -22,7 +22,7 @@ be usable and modules built on this repository could be used with Magento.
 
 h2. Current Status
 
-* Current upstream version: Magento Community Edition 1.4.0.1
+* Current upstream version: Magento Community Edition 1.4.1.1
 * Overall state: functional though not thoroughly tested
 * Installation completes successfully.
 * The home page renders (default theme sans the content) and CMS works.
