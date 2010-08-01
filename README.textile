@@ -22,7 +22,7 @@ be usable and modules built on this repository could be used with Magento.
 
 h2. Current Status
 
-* Current upstream version: Magento Community Edition 1.4.0.1
+* Current upstream version: Magento Community Edition 1.4.1.1
 * Overall state: functional though not thoroughly tested
 * Installation completes successfully.
 * The home page renders (default theme sans the content) and CMS works.
@@ -57,3 +57,11 @@ simply ignore it with no adverse effects.
 is bundled with and designed for! So far no source code within core directories has been modified. Only a few
 files were overridden and copied/modified under app/code/community/Mage to fix issues due to dependencies
 on removed modules.
+
+h2. Installation
+
+# Clone this repository to a directory within your webroot.
+# The Zend Framework is included as a git submodule so it must be initialized:
+## @$ git submodule init@
+## @$ git submodule update@
+# Visit the web root in your browser to start installation.
