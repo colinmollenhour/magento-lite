@@ -36,6 +36,16 @@
     </routers>
   </admin>
 
+  <adminhtml>
+    <layout>
+      <updates>
+        <magelite module="Mage_Lite">
+          <file>magelite.xml</file>
+        </magelite>
+      </updates>
+    </layout>
+  </adminhtml>
+
   <!-- set default admin theme to make some overrides -->
   <stores>
     <admin>

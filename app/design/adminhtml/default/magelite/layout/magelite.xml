@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<layout>
+
+<!--
+Default layout, loads most of the pages
+-->
+
+    <default>
+        <reference name="head">
+            <action method="removeItem"><type>js</type><script>mage/adminhtml/product.js</script></action>
+        </reference>
+        <reference name="notifications">
+            <remove name="notification_survey"/>
+        </reference>
+    </default>
+
+</layout>
