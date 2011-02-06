@@ -37,6 +37,15 @@
   </admin>
 
   <adminhtml>
+    <events>
+      <controller_action_predispatch>
+        <observers>
+          <adminnotification>
+            <type>disabled</type>
+          </adminnotification>
+        </observers>
+      </controller_action_predispatch>
+    </events>
     <layout>
       <updates>
         <magelite module="Mage_Lite">

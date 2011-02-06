@@ -27,6 +27,10 @@
 -->
 <config>
     <modules>
+        <Mage_AdminNotification>
+            <active>false</active>
+            <codePool>core</codePool>
+        </Mage_AdminNotification>
         <Mage_Api>
             <active>false</active>
             <codePool>core</codePool>
