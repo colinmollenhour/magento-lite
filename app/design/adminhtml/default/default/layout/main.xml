@@ -71,7 +71,6 @@ Default layout, loads most of the pages
                 <action method="addJs"><script>mage/adminhtml/accordion.js</script></action>
                 <action method="addJs"><script>mage/adminhtml/tools.js</script></action>
                 <action method="addJs"><script>mage/adminhtml/uploader.js</script></action>
-                <action method="addJs"><script>mage/adminhtml/product.js</script></action>
 
                 <action method="addCss"><name>reset.css</name></action>
                 <action method="addCss"><name>boxes.css</name></action>
@@ -109,7 +108,6 @@ Default layout, loads most of the pages
             <block type="core/text_list" name="notifications" as="notifications">
                 <block type="adminhtml/notification_baseurl" name="notification_baseurl" as="notification_baseurl" template="notification/baseurl.phtml"></block>
                 <block type="adminhtml/cache_notifications" name="cache_notifications" template="system/cache/notifications.phtml"></block>
-                <block type="adminhtml/notification_survey" name="notification_survey" template="notification/survey.phtml"/>
             </block>
             <block type="adminhtml/widget_breadcrumbs" name="breadcrumbs" as="breadcrumbs"></block>
 
