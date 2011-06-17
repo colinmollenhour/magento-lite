@@ -105,6 +105,7 @@
             </core_locale_set_locale>
         </events>
         <global_search>
+<!--
             <products>
                 <class>adminhtml/search_catalog</class>
                 <acl>catalog</acl>
@@ -117,6 +118,7 @@
                 <class>adminhtml/search_order</class>
                 <acl>sales</acl>
             </sales>
+-->
         </global_search>
         <translate>
             <modules>
