@@ -10,7 +10,7 @@
 
     <helpers>
       <!-- satisfy usage of legacy helpers in various places -->
-      <catalog><rewrite><data>Mage_Core_Helper_Data</data></rewrite></catalog>
+      <catalog><rewrite><data>Mage_Lite_Helper_Catalog_Data</data></rewrite></catalog>
       <catalogrule><rewrite><data>Mage_Core_Helper_Data</data></rewrite></catalogrule>
     </helpers>
 
