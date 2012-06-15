@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Eav
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -28,12 +28,27 @@
 /**
  * Eav attribute set model
  *
- * @category   Mage
- * @package    Mage_Eav
- * @author     Magento Core Team <core@magentocommerce.com>
+ * @method Mage_Eav_Model_Resource_Entity_Attribute_Set _getResource()
+ * @method Mage_Eav_Model_Resource_Entity_Attribute_Set getResource()
+ * @method int getEntityTypeId()
+ * @method Mage_Eav_Model_Entity_Attribute_Set setEntityTypeId(int $value)
+ * @method string getAttributeSetName()
+ * @method Mage_Eav_Model_Entity_Attribute_Set setAttributeSetName(string $value)
+ * @method int getSortOrder()
+ * @method Mage_Eav_Model_Entity_Attribute_Set setSortOrder(int $value)
+ *
+ * @category    Mage
+ * @package     Mage_Eav
+ * @author      Magento Core Team <core@magentocommerce.com>
  */
 class Mage_Eav_Model_Entity_Attribute_Set extends Mage_Core_Model_Abstract
 {
+    /**
+     * Prefix of model events names
+     * @var string
+     */
+    protected $_eventPrefix = 'eav_entity_attribute_set';
+
     /**
      * Initialize resource model
      *
@@ -57,7 +72,7 @@ class Mage_Eav_Model_Entity_Attribute_Set extends Mage_Core_Model_Abstract
             ->load();
 
         $newGroups = array();
-        foreach( $groups as $group ) {
+        foreach ($groups as $group) {
             $newGroup = clone $group;
             $newGroup->setId(null)
                 ->setAttributeSetId($this->getId())
@@ -69,7 +84,7 @@ class Mage_Eav_Model_Entity_Attribute_Set extends Mage_Core_Model_Abstract
                 ->load();
 
             $newAttributes = array();
-            foreach( $groupAttributesCollection as $attribute ) {
+            foreach ($groupAttributesCollection as $attribute) {
                 $newAttribute = Mage::getModel('eav/entity_attribute')
                     ->setId($attribute->getId())
                     //->setAttributeGroupId($newGroup->getId())
@@ -82,6 +97,7 @@ class Mage_Eav_Model_Entity_Attribute_Set extends Mage_Core_Model_Abstract
             $newGroups[] = $newGroup;
         }
         $this->setGroups($newGroups);
+
         return $this;
     }
 
@@ -89,6 +105,7 @@ class Mage_Eav_Model_Entity_Attribute_Set extends Mage_Core_Model_Abstract
      * Collect data for save
      *
      * @param array $data
+     * @return Mage_Eav_Model_Entity_Attribute_Set
      */
     public function organizeData($data)
     {
@@ -104,7 +121,7 @@ class Mage_Eav_Model_Entity_Attribute_Set extends Mage_Core_Model_Abstract
                 ->getValidAttributeIds($ids);
         }
         if( $data['groups'] ) {
-            foreach( $data['groups'] as $group ) {
+            foreach ($data['groups'] as $group) {
                 $modelGroup = Mage::getModel('eav/entity_attribute_group');
                 $modelGroup->setId(is_numeric($group[0]) && $group[0] > 0 ? $group[0] : null)
                     ->setAttributeGroupName($group[1])
@@ -155,22 +172,25 @@ class Mage_Eav_Model_Entity_Attribute_Set extends Mage_Core_Model_Abstract
         }
         $this->setAttributeSetName($data['attribute_set_name'])
             ->setEntityTypeId($this->getEntityTypeId());
+
+        return $this;
     }
 
     /**
      * Validate attribute set name
      *
      * @param string $name
-     * @throws Mage_Core_Exception
+     * @throws Mage_Eav_Exception
      * @return bool
      */
     public function validate()
     {
         if (!$this->_getResource()->validate($this, $this->getAttributeSetName())) {
-            Mage::throwException(
+            throw Mage::exception('Mage_Eav',
                 Mage::helper('eav')->__('Attribute set with the "%s" name already exists.', $this->getAttributeSetName())
             );
         }
+
         return true;
     }
 
@@ -219,8 +239,7 @@ class Mage_Eav_Model_Entity_Attribute_Set extends Mage_Core_Model_Abstract
                         $attributeSetInfo[$setId] = $setInfo[$attribute->getAttributeId()][$setId];
                     }
                     $attribute->setAttributeSetInfo($attributeSetInfo);
-                }
-                else {
+                } else {
                     if (isset($setInfo[$attribute->getAttributeId()])) {
                         $attribute->setAttributeSetInfo($setInfo[$attribute->getAttributeId()]);
                     }
@@ -232,5 +251,24 @@ class Mage_Eav_Model_Entity_Attribute_Set extends Mage_Core_Model_Abstract
         }
 
         return $this;
+    }
+
+    /**
+     * Return default Group Id for current or defined Attribute Set
+     *
+     * @param int $setId
+     * @return int|null
+     */
+    public function getDefaultGroupId($setId = null)
+    {
+        if ($setId === null) {
+            $setId = $this->getId();
+        }
+        if ($setId) {
+            $groupId = $this->_getResource()->getDefaultGroupId($setId);
+        } else {
+            $groupId = null;
+        }
+        return $groupId;
     }
 }

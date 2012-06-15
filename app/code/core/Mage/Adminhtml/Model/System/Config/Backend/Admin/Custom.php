@@ -20,17 +20,17 @@
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 
 /**
- * Adminhtml backend model for "Use Secure URLs in Admin" option
+ * Adminhtml backend model for "Custom Admin URL" option
  *
  * @category   Mage
  * @package    Mage_Adminhtml
- * @author      Magento Core Team <core@magentocommerce.com>
+ * @author     Magento Core Team <core@magentocommerce.com>
  */
 class Mage_Adminhtml_Model_System_Config_Backend_Admin_Custom extends Mage_Core_Model_Config_Data
 {
@@ -39,7 +39,14 @@ class Mage_Adminhtml_Model_System_Config_Backend_Admin_Custom extends Mage_Core_
 
     const XML_PATH_UNSECURE_BASE_URL        = 'web/unsecure/base_url';
     const XML_PATH_SECURE_BASE_URL          = 'web/secure/base_url';
+    const XML_PATH_UNSECURE_BASE_LINK_URL   = 'web/unsecure/base_link_url';
+    const XML_PATH_SECURE_BASE_LINK_URL     = 'web/secure/base_link_url';
 
+    /**
+     * Validate value before save
+     *
+     * @return Mage_Adminhtml_Model_System_Config_Backend_Admin_Custom
+     */
     protected function _beforeSave()
     {
         $value = $this->getValue();
@@ -52,6 +59,11 @@ class Mage_Adminhtml_Model_System_Config_Backend_Admin_Custom extends Mage_Core_
         return $this;
     }
 
+    /**
+     * Change secure/unsecure base_url after use_custom_url was modified
+     *
+     * @return Mage_Adminhtml_Model_System_Config_Backend_Admin_Custom
+     */
     public function _afterSave()
     {
         $useCustomUrl = $this->getData('groups/url/fields/use_custom/value');
@@ -62,12 +74,18 @@ class Mage_Adminhtml_Model_System_Config_Backend_Admin_Custom extends Mage_Core_
         }
 
         if ($useCustomUrl == 1) {
-            Mage::getConfig()->saveConfig(self::XML_PATH_SECURE_BASE_URL, $value, self::CONFIG_SCOPE, self::CONFIG_SCOPE_ID);
-            Mage::getConfig()->saveConfig(self::XML_PATH_UNSECURE_BASE_URL, $value, self::CONFIG_SCOPE, self::CONFIG_SCOPE_ID);
-        }
-        else {
-            Mage::getConfig()->deleteConfig(self::XML_PATH_SECURE_BASE_URL, self::CONFIG_SCOPE, self::CONFIG_SCOPE_ID);
-            Mage::getConfig()->deleteConfig(self::XML_PATH_UNSECURE_BASE_URL, self::CONFIG_SCOPE, self::CONFIG_SCOPE_ID);
+            Mage::getConfig()->saveConfig(
+                self::XML_PATH_SECURE_BASE_URL,
+                $value,
+                self::CONFIG_SCOPE,
+                self::CONFIG_SCOPE_ID
+            );
+            Mage::getConfig()->saveConfig(
+                self::XML_PATH_UNSECURE_BASE_URL,
+                $value,
+                self::CONFIG_SCOPE,
+                self::CONFIG_SCOPE_ID
+            );
         }
 
         return $this;

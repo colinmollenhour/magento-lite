@@ -21,14 +21,14 @@
  *
  * @category    Mage
  * @package     Mage_Page
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 -->
 <config>
     <modules>
         <Mage_Page>
-            <version>0.7.0</version>
+            <version>1.6.0.0</version>
         </Mage_Page>
     </modules>
     <global>
@@ -46,7 +46,7 @@
             <layouts>
                 <empty module="page" translate="label">
                     <label>Empty</label>
-                    <template>page/one-column.phtml</template>
+                    <template>page/empty.phtml</template>
                     <layout_handle>page_empty</layout_handle>
                 </empty>
                 <one_column module="page" translate="label">
@@ -129,8 +129,15 @@
                 <welcome>Default welcome msg!</welcome>
             </header>
             <footer translate="copyright" module="page">
-                <copyright>&amp;copy; 2008 Magento Demo Store. All Rights Reserved.</copyright>
+                <copyright>&amp;copy; 2012 Magento Demo Store. All Rights Reserved.</copyright>
             </footer>
         </design>
+        <system>
+            <media_storage_configuration>
+                <allowed_resources>
+                    <site_favicons>favicon</site_favicons>
+                </allowed_resources>
+            </media_storage_configuration>
+        </system>
     </default>
 </config>

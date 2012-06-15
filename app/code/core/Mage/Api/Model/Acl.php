@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Api
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -45,6 +45,17 @@ class Mage_Api_Model_Acl extends Zend_Acl
      *
      */
     const ROLE_TYPE_USER = 'U';
+
+    /**
+     * User types for store access
+     * G - Guest customer (anonymous)
+     * C - Authenticated customer
+     * A - Authenticated admin user
+     *
+     */
+    const USER_TYPE_GUEST    = 'G';
+    const USER_TYPE_CUSTOMER = 'C';
+    const USER_TYPE_ADMIN    = 'A';
 
     /**
      * Permission level to deny access

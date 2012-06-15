@@ -20,15 +20,23 @@
  *
  * @category    Mage
  * @package     Mage_Core
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
  * Store group model
  *
- * @category   Mage
- * @package    Mage_Core
+ * @method Mage_Core_Model_Resource_Store_Group _getResource()
+ * @method Mage_Core_Model_Resource_Store_Group getResource()
+ * @method Mage_Core_Model_Store_Group setWebsiteId(int $value)
+ * @method string getName()
+ * @method Mage_Core_Model_Store_Group setName(string $value)
+ * @method Mage_Core_Model_Store_Group setRootCategoryId(int $value)
+ * @method Mage_Core_Model_Store_Group setDefaultStoreId(int $value)
+ *
+ * @category    Mage
+ * @package     Mage_Core
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 
@@ -210,13 +218,53 @@ class Mage_Core_Model_Store_Group extends Mage_Core_Model_Abstract
      */
     public function getDefaultStore()
     {
-        if (!$this->getDefaultStoreId()) {
+        if (!$this->hasDefaultStoreId()) {
             return false;
         }
         if (is_null($this->_stores)) {
             $this->_loadStores();
         }
         return $this->_defaultStore;
+    }
+
+    /**
+     * Get most suitable store by locale
+     * If no store with given locale is found - default store is returned
+     * If group has no stores - null is returned
+     *
+     * @param string $locale
+     * @return Mage_Core_Model_Store|null
+     */
+    public function getDefaultStoreByLocale($locale)
+    {
+        if ($this->getDefaultStore() && $this->getDefaultStore()->getLocaleCode() == $locale) {
+            return $this->getDefaultStore();
+        } else {
+            $stores = $this->getStoresByLocale($locale);
+            if (count($stores)) {
+                return $stores[0];
+            } else {
+                return $this->getDefaultStore() ? $this->getDefaultStore() : null;
+            }
+        }
+    }
+
+    /**
+     * Retrieve list of stores with given locale
+     *
+     * @param $locale
+     * @return array
+     */
+    public function getStoresByLocale($locale)
+    {
+        $stores = array();
+        foreach ($this->getStores() as $store) {
+            /* @var $store Mage_Core_Model_Store */
+            if ($store->getLocaleCode() == $locale) {
+                array_push($stores, $store);
+            }
+        }
+        return $stores;
     }
 
     /**

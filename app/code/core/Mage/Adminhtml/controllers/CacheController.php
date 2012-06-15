@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -53,6 +53,7 @@ class Mage_Adminhtml_CacheController extends Mage_Adminhtml_Controller_Action
      */
     public function flushAllAction()
     {
+        Mage::dispatchEvent('adminhtml_cache_flush_all');
         Mage::app()->getCacheInstance()->flush();
         $this->_getSession()->addSuccess(Mage::helper('adminhtml')->__("The cache storage has been flushed."));
         $this->_redirect('*/*');
@@ -64,6 +65,7 @@ class Mage_Adminhtml_CacheController extends Mage_Adminhtml_Controller_Action
     public function flushSystemAction()
     {
         Mage::app()->cleanCache();
+        Mage::dispatchEvent('adminhtml_cache_flush_system');
         $this->_getSession()->addSuccess(Mage::helper('adminhtml')->__("The Magento cache storage has been flushed."));
         $this->_redirect('*/*');
     }
@@ -123,6 +125,7 @@ class Mage_Adminhtml_CacheController extends Mage_Adminhtml_Controller_Action
         if (!empty($types)) {
             foreach ($types as $type) {
                 $tags = Mage::app()->getCacheInstance()->cleanType($type);
+                Mage::dispatchEvent('adminhtml_cache_refresh_type', array('type' => $type));
                 $updatedTypes++;
             }
         }
@@ -187,6 +190,6 @@ class Mage_Adminhtml_CacheController extends Mage_Adminhtml_Controller_Action
      */
     protected function _isAllowed()
     {
-        return Mage::getSingleton('admin/session')->isAllowed('cache');
+        return Mage::getSingleton('admin/session')->isAllowed('system/cache');
     }
 }

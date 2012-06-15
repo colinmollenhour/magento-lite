@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -69,11 +69,11 @@ class Mage_Adminhtml_Helper_Dashboard_Data extends Mage_Core_Helper_Data
     public function getDatePeriods()
     {
         return array(
-            '24h'=>$this->__('Last 24 Hours'),
-            '7d'=>$this->__('Last 7 Days'),
-            '1m'=>$this->__('Current Month'),
-            '1y'=>$this->__('YTD'),
-            '2y'=>$this->__('2YTD')
+            '24h' => $this->__('Last 24 Hours'),
+            '7d'  => $this->__('Last 7 Days'),
+            '1m'  => $this->__('Current Month'),
+            '1y'  => $this->__('YTD'),
+            '2y'  => $this->__('2YTD')
         );
     }
 

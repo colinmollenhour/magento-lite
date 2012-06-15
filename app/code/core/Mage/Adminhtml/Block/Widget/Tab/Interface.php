@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -34,8 +34,31 @@
  */
 interface Mage_Adminhtml_Block_Widget_Tab_Interface
 {
+    /**
+     * Return Tab label
+     *
+     * @return string
+     */
     public function getTabLabel();
+
+    /**
+     * Return Tab title
+     *
+     * @return string
+     */
     public function getTabTitle();
+
+    /**
+     * Can show tab in tabs
+     *
+     * @return boolean
+     */
     public function canShowTab();
+
+    /**
+     * Tab is hidden
+     *
+     * @return boolean
+     */
     public function isHidden();
 }

@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Dataflow
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -74,8 +74,7 @@ File to upload: <input type="file" name="io_file"/> <input type="submit" value="
             exit;
         }
         if (!empty($_FILES['io_file']['tmp_name'])) {
-            //$this->setData(file_get_contents($_FILES['io_file']['tmp_name']));
-            $uploader = new Varien_File_Uploader('io_file');
+            $uploader = new Mage_Core_Model_File_Uploader('io_file');
             $uploader->setAllowedExtensions(array('csv','xml'));
             $path = Mage::app()->getConfig()->getTempVarDir().'/import/';
             $uploader->save($path);

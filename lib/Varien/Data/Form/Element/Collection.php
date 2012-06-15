@@ -116,10 +116,11 @@ class Varien_Data_Form_Element_Collection implements ArrayAccess, IteratorAggreg
      *
      * @todo get it straight with $after
      * @param Varien_Data_Form_Element_Abstract $element
-     * @param boolean|'^'|string $after
-     * @return Varien_Data_Form_Element_Abstract
+     * @param bool|string $after
+     *
+     * @return Varien_Data_Form_Element_Collection
      */
-    public function add(Varien_Data_Form_Element_Abstract $element, $after=false)
+    public function add(Varien_Data_Form_Element_Abstract $element, $after = false)
     {
         // Set the Form for the node
         if ($this->_container->getForm() instanceof Varien_Data_Form) {
@@ -139,7 +140,7 @@ class Varien_Data_Form_Element_Collection implements ArrayAccess, IteratorAggreg
                 if ($currElement->getId() == $after) {
                     $newOrderElements[] = $currElement;
                     $newOrderElements[] = $element;
-                    $this->_elements = array_merge($newOrderElements, array_slice($this->_elements, $index+1));
+                    $this->_elements = array_merge($newOrderElements, array_slice($this->_elements, $index + 1));
                     return $element;
                 }
                 $newOrderElements[] = $currElement;
@@ -175,6 +176,8 @@ class Varien_Data_Form_Element_Collection implements ArrayAccess, IteratorAggreg
                 unset($this->_elements[$index]);
             }
         }
+        // Renumber elements for further correct adding and removing other elements
+        $this->_elements = array_merge($this->_elements, array());
         return $this;
     }
 

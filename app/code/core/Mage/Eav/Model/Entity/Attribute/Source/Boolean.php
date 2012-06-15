@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Eav
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -81,22 +81,30 @@ class Mage_Eav_Model_Entity_Attribute_Source_Boolean extends Mage_Eav_Model_Enti
     }
 
     /**
-     * Retrieve Column(s) for Flat
+     * Retrieve flat column definition
      *
      * @return array
      */
     public function getFlatColums()
     {
-        $columns = array();
-        $columns[$this->getAttribute()->getAttributeCode()] = array(
-            'type'      => 'tinyint(1)',
+        $attributeCode = $this->getAttribute()->getAttributeCode();
+        $column = array(
             'unsigned'  => false,
-            'is_null'   => true,
             'default'   => null,
             'extra'     => null
         );
 
-        return $columns;
+        if (Mage::helper('core')->useDbCompatibleMode()) {
+            $column['type']     = 'tinyint(1)';
+            $column['is_null']  = true;
+        } else {
+            $column['type']     = Varien_Db_Ddl_Table::TYPE_SMALLINT;
+            $column['length']   = 1;
+            $column['nullable'] = true;
+            $column['comment']  = $attributeCode . ' column';
+        }
+
+        return array($attributeCode => $column);
     }
 
     /**

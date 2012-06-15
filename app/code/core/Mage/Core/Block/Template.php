@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Core
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -34,6 +34,9 @@
  */
 class Mage_Core_Block_Template extends Mage_Core_Block_Abstract
 {
+    const XML_PATH_DEBUG_TEMPLATE_HINTS         = 'dev/debug/template_hints';
+    const XML_PATH_DEBUG_TEMPLATE_HINTS_BLOCKS  = 'dev/debug/template_hints_blocks';
+    const XML_PATH_TEMPLATE_ALLOW_SYMLINK       = 'dev/template/allow_symlink';
 
     /**
      * View scripts directory
@@ -52,6 +55,13 @@ class Mage_Core_Block_Template extends Mage_Core_Block_Abstract
     protected $_baseUrl;
 
     protected $_jsUrl;
+
+    /**
+     * Is allowed symlinks flag
+     *
+     * @var bool
+     */
+    protected $_allowSymlinks = null;
 
     protected static $_showTemplateHints;
     protected static $_showTemplateHintsBlocks;
@@ -150,19 +160,25 @@ class Mage_Core_Block_Template extends Mage_Core_Block_Abstract
     }
 
     /**
-     * Set template location dire
+     * Set template location directory
      *
      * @param string $dir
      * @return Mage_Core_Block_Template
      */
     public function setScriptPath($dir)
     {
-        $this->_viewDir = $dir;
+        $scriptPath = realpath($dir);
+        if (strpos($scriptPath, realpath(Mage::getBaseDir('design'))) === 0 || $this->_getAllowSymlinks()) {
+            $this->_viewDir = $dir;
+        } else {
+            Mage::log('Not valid script path:' . $dir, Zend_Log::CRIT, null, null, true);
+        }
         return $this;
     }
 
     /**
-     * Check if dirrect output is allowed for block
+     * Check if direct output is allowed for block
+     *
      * @return bool
      */
     public function getDirectOutput()
@@ -176,9 +192,9 @@ class Mage_Core_Block_Template extends Mage_Core_Block_Abstract
     public function getShowTemplateHints()
     {
         if (is_null(self::$_showTemplateHints)) {
-            self::$_showTemplateHints = Mage::getStoreConfig('dev/debug/template_hints')
+            self::$_showTemplateHints = Mage::getStoreConfig(self::XML_PATH_DEBUG_TEMPLATE_HINTS)
                 && Mage::helper('core')->isDevAllowed();
-            self::$_showTemplateHintsBlocks = Mage::getStoreConfig('dev/debug/template_hints_blocks')
+            self::$_showTemplateHintsBlocks = Mage::getStoreConfig(self::XML_PATH_DEBUG_TEMPLATE_HINTS_BLOCKS)
                 && Mage::helper('core')->isDevAllowed();
         }
         return self::$_showTemplateHints;
@@ -194,22 +210,39 @@ class Mage_Core_Block_Template extends Mage_Core_Block_Abstract
     {
         Varien_Profiler::start($fileName);
 
-        extract ($this->_viewVars);
+        // EXTR_SKIP protects from overriding
+        // already defined variables
+        extract ($this->_viewVars, EXTR_SKIP);
         $do = $this->getDirectOutput();
 
         if (!$do) {
             ob_start();
         }
         if ($this->getShowTemplateHints()) {
-            echo '<div style="position:relative; border:1px dotted red; margin:6px 2px; padding:18px 2px 2px 2px; zoom:1;"><div style="position:absolute; left:0; top:0; padding:2px 5px; background:red; color:white; font:normal 11px Arial; text-align:left !important; z-index:998;" onmouseover="this.style.zIndex=\'999\'" onmouseout="this.style.zIndex=\'998\'" title="'.$fileName.'">'.$fileName.'</div>';
+            echo <<<HTML
+<div style="position:relative; border:1px dotted red; margin:6px 2px; padding:18px 2px 2px 2px; zoom:1;">
+<div style="position:absolute; left:0; top:0; padding:2px 5px; background:red; color:white; font:normal 11px Arial;
+text-align:left !important; z-index:998;" onmouseover="this.style.zIndex='999'"
+onmouseout="this.style.zIndex='998'" title="{$fileName}">{$fileName}</div>
+HTML;
             if (self::$_showTemplateHintsBlocks) {
                 $thisClass = get_class($this);
-                echo '<div style="position:absolute; right:0; top:0; padding:2px 5px; background:red; color:blue; font:normal 11px Arial; text-align:left !important; z-index:998;" onmouseover="this.style.zIndex=\'999\'" onmouseout="this.style.zIndex=\'998\'" title="'.$thisClass.'">'.$thisClass.'</div>';
+                echo <<<HTML
+<div style="position:absolute; right:0; top:0; padding:2px 5px; background:red; color:blue; font:normal 11px Arial;
+text-align:left !important; z-index:998;" onmouseover="this.style.zIndex='999'" onmouseout="this.style.zIndex='998'"
+title="{$thisClass}">{$thisClass}</div>
+HTML;
             }
         }
 
         try {
-            include $this->_viewDir . DS . $fileName;
+            $includeFilePath = realpath($this->_viewDir . DS . $fileName);
+            if (strpos($includeFilePath, realpath($this->_viewDir)) === 0 || $this->_getAllowSymlinks()) {
+                include $includeFilePath;
+            } else {
+                Mage::log('Not valid template file:'.$fileName, Zend_Log::CRIT, null, null, true);
+            }
+
         } catch (Exception $e) {
             ob_get_clean();
             throw $e;
@@ -308,5 +341,18 @@ class Mage_Core_Block_Template extends Mage_Core_Block_Abstract
             $this->getTemplateFile(),
             'template' => $this->getTemplate()
         );
+    }
+
+    /**
+     * Get is allowed symliks flag
+     *
+     * @return bool
+     */
+    protected function _getAllowSymlinks()
+    {
+        if (is_null($this->_allowSymlinks)) {
+            $this->_allowSymlinks = Mage::getStoreConfigFlag(self::XML_PATH_TEMPLATE_ALLOW_SYMLINK);
+        }
+        return $this->_allowSymlinks;
     }
 }

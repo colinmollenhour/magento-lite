@@ -19,7 +19,7 @@
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 MediabrowserUtility = {
@@ -228,7 +228,8 @@ Mediabrowser.prototype = {
     getTargetElement: function() {
         if (typeof(tinyMCE) != 'undefined' && tinyMCE.get(this.targetElementId)) {
             if ((opener = this.getMediaBrowserOpener())) {
-                return opener.document.getElementById('src') || opener.document.getElementById('href');
+                var targetElementId = tinyMceEditors.get(this.targetElementId).getMediaBrowserTargetElementId();
+                return opener.document.getElementById(targetElementId);
             } else {
                 return null;
             }
@@ -313,7 +314,7 @@ Mediabrowser.prototype = {
             i++;
         });
         new Ajax.Request(this.deleteFilesUrl, {
-            parameters: {files: ids.toJSON()},
+            parameters: {files: Object.toJSON(ids)},
             onSuccess: function(transport) {
                 try {
                     this.onAjaxSuccess(transport);

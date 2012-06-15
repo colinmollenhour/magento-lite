@@ -20,12 +20,39 @@
  *
  * @category    Mage
  * @package     Mage_Admin
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
  * Admin user model
+ *
+ * @method Mage_Admin_Model_Resource_User _getResource()
+ * @method Mage_Admin_Model_Resource_User getResource()
+ * @method string getFirstname()
+ * @method Mage_Admin_Model_User setFirstname(string $value)
+ * @method string getLastname()
+ * @method Mage_Admin_Model_User setLastname(string $value)
+ * @method string getEmail()
+ * @method Mage_Admin_Model_User setEmail(string $value)
+ * @method string getUsername()
+ * @method Mage_Admin_Model_User setUsername(string $value)
+ * @method string getPassword()
+ * @method Mage_Admin_Model_User setPassword(string $value)
+ * @method string getCreated()
+ * @method Mage_Admin_Model_User setCreated(string $value)
+ * @method string getModified()
+ * @method Mage_Admin_Model_User setModified(string $value)
+ * @method string getLogdate()
+ * @method Mage_Admin_Model_User setLogdate(string $value)
+ * @method int getLognum()
+ * @method Mage_Admin_Model_User setLognum(int $value)
+ * @method int getReloadAclFlag()
+ * @method Mage_Admin_Model_User setReloadAclFlag(int $value)
+ * @method int getIsActive()
+ * @method Mage_Admin_Model_User setIsActive(int $value)
+ * @method string getExtra()
+ * @method Mage_Admin_Model_User setExtra(string $value)
  *
  * @category    Mage
  * @package     Mage_Admin
@@ -33,22 +60,41 @@
  */
 class Mage_Admin_Model_User extends Mage_Core_Model_Abstract
 {
+    /**
+     * Configuration paths for email templates and identities
+     */
     const XML_PATH_FORGOT_EMAIL_TEMPLATE    = 'admin/emails/forgot_email_template';
     const XML_PATH_FORGOT_EMAIL_IDENTITY    = 'admin/emails/forgot_email_identity';
     const XML_PATH_STARTUP_PAGE             = 'admin/startup/page';
+
+    /**
+     * Minimum length of admin password
+     */
     const MIN_PASSWORD_LENGTH = 7;
 
+    /**
+     * Model event prefix
+     *
+     * @var string
+     */
     protected $_eventPrefix = 'admin_user';
 
     /**
+     * Admin role
+     *
      * @var Mage_Admin_Model_Roles
      */
     protected $_role;
 
+    /**
+     * Available resources flag
+     *
+     * @var boolean
+     */
     protected $_hasAvailableResources = true;
 
     /**
-     * Varien constructor
+     * Initialize user model
      */
     protected function _construct()
     {
@@ -78,13 +124,15 @@ class Mage_Admin_Model_User extends Mage_Core_Model_Abstract
             $data['username'] = $this->getUsername();
         }
 
-        if ($this->getNewPassword()) { // change password
+        if ($this->getNewPassword()) {
+            // Change password
             $data['password'] = $this->_getEncodedPassword($this->getNewPassword());
-        } elseif ($this->getPassword() && $this->getPassword() != $this->getOrigData('password')) { // new user password
+        } elseif ($this->getPassword() && $this->getPassword() != $this->getOrigData('password')) {
+            // New user password
             $data['password'] = $this->_getEncodedPassword($this->getPassword());
         }
 
-        if ( !is_null($this->getIsActive()) ) {
+        if (!is_null($this->getIsActive())) {
             $data['is_active'] = intval($this->getIsActive());
         }
 
@@ -119,6 +167,11 @@ class Mage_Admin_Model_User extends Mage_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * Retrieve user roles
+     *
+     * @return array
+     */
     public function getRoles()
     {
         return $this->_getResource()->getRoles($this);
@@ -141,30 +194,55 @@ class Mage_Admin_Model_User extends Mage_Core_Model_Abstract
         return $this->_role;
     }
 
+    /**
+     * Unassign user from his current role
+     *
+     * @return Mage_Admin_Model_User
+     */
     public function deleteFromRole()
     {
         $this->_getResource()->deleteFromRole($this);
         return $this;
     }
 
+    /**
+     * Check if such combination role/user exists
+     *
+     * @return boolean
+     */
     public function roleUserExists()
     {
         $result = $this->_getResource()->roleUserExists($this);
-        return ( is_array($result) && count($result) > 0 ) ? true : false;
+        return (is_array($result) && count($result) > 0) ? true : false;
     }
 
+    /**
+     * Assign user to role
+     *
+     * @return Mage_Admin_Model_User
+     */
     public function add()
     {
         $this->_getResource()->add($this);
         return $this;
     }
 
+    /**
+     * Check if user exists based on its id, username and email
+     *
+     * @return boolean
+     */
     public function userExists()
     {
         $result = $this->_getResource()->userExists($this);
-        return ( is_array($result) && count($result) > 0 ) ? true : false;
+        return (is_array($result) && count($result) > 0) ? true : false;
     }
 
+    /**
+     * Retrieve admin user collection
+     *
+     * @return Mage_Admin_Model_Resource_User_Collection
+     */
     public function getCollection() {
         return Mage::getResourceModel('admin/user_collection');
     }
@@ -173,32 +251,54 @@ class Mage_Admin_Model_User extends Mage_Core_Model_Abstract
      * Send email with new user password
      *
      * @return Mage_Admin_Model_User
+     * @deprecated deprecated since version 1.6.1.0
      */
     public function sendNewPasswordEmail()
     {
-        $translate = Mage::getSingleton('core/translate');
-        /* @var $translate Mage_Core_Model_Translate */
-        $translate->setTranslateInline(false);
+        return $this;
+    }
 
-        Mage::getModel('core/email_template')
-            ->setDesignConfig(array('area' => 'adminhtml', 'store' => $this->getStoreId()))
-            ->sendTransactional(
-                Mage::getStoreConfig(self::XML_PATH_FORGOT_EMAIL_TEMPLATE),
-                Mage::getStoreConfig(self::XML_PATH_FORGOT_EMAIL_IDENTITY),
-                $this->getEmail(),
-                $this->getName(),
-                array('user' => $this, 'password' => $this->getPlainPassword()));
+    /**
+     * Send email with reset password confirmation link
+     *
+     * @return Mage_Admin_Model_User
+     */
+    public function sendPasswordResetConfirmationEmail()
+    {
+        /** @var $mailer Mage_Core_Model_Email_Template_Mailer */
+        $mailer = Mage::getModel('core/email_template_mailer');
+        $emailInfo = Mage::getModel('core/email_info');
+        $emailInfo->addTo($this->getEmail(), $this->getName());
+        $mailer->addEmailInfo($emailInfo);
 
-        $translate->setTranslateInline(true);
+        // Set all required params and send emails
+        $mailer->setSender(Mage::getStoreConfig(self::XML_PATH_FORGOT_EMAIL_IDENTITY));
+        $mailer->setStoreId(0);
+        $mailer->setTemplateId(Mage::getStoreConfig(self::XML_PATH_FORGOT_EMAIL_TEMPLATE));
+        $mailer->setTemplateParams(array(
+            'user' => $this
+        ));
+        $mailer->send();
 
         return $this;
     }
 
-    public function getName($separator=' ')
+    /**
+     * Retrieve user name
+     *
+     * @param string $separator
+     * @return string
+     */
+    public function getName($separator = ' ')
     {
         return $this->getFirstname() . $separator . $this->getLastname();
     }
 
+    /**
+     * Retrieve user identifier
+     *
+     * @return mixed
+     */
     public function getId()
     {
         return $this->getUserId();
@@ -228,8 +328,12 @@ class Mage_Admin_Model_User extends Mage_Core_Model_Abstract
         $result = false;
 
         try {
+            Mage::dispatchEvent('admin_user_authenticate_before', array(
+                'username' => $username,
+                'user'     => $this
+            ));
             $this->loadByUsername($username);
-            $sensitive = ($config) ? $username==$this->getUsername() : true;
+            $sensitive = ($config) ? $username == $this->getUsername() : true;
 
             if ($sensitive && $this->getId() && Mage::helper('core')->validateHash($password, $this->getPassword())) {
                 if ($this->getIsActive() != '1') {
@@ -274,6 +378,11 @@ class Mage_Admin_Model_User extends Mage_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * Reload current user
+     *
+     * @return Mage_Admin_Model_User
+     */
     public function reload()
     {
         $id = $this->getId();
@@ -282,20 +391,38 @@ class Mage_Admin_Model_User extends Mage_Core_Model_Abstract
         return $this;
     }
 
+    /**
+     * Load user by its username
+     *
+     * @param string $username
+     * @return Mage_Admin_Model_User
+     */
     public function loadByUsername($username)
     {
         $this->setData($this->getResource()->loadByUsername($username));
         return $this;
     }
 
+    /**
+     * Check if user is assigned to any role
+     *
+     * @param int|Mage_Core_Admin_Model_User $user
+     * @return null|boolean|array
+     */
     public function hasAssigned2Role($user)
     {
         return $this->getResource()->hasAssigned2Role($user);
     }
 
-    protected function _getEncodedPassword($pwd)
+    /**
+     * Retrieve encoded password
+     *
+     * @param string $password
+     * @return string
+     */
+    protected function _getEncodedPassword($password)
     {
-        return Mage::helper('core')->getHash($pwd, 2);
+        return Mage::helper('core')->getHash($password, 2);
     }
 
     /**
@@ -306,18 +433,18 @@ class Mage_Admin_Model_User extends Mage_Core_Model_Abstract
      * @param integer $level
      * @return string
      */
-    public function findFirstAvailableMenu($parent=null, $path='', $level=0)
+    public function findFirstAvailableMenu($parent = null, $path = '', $level = 0)
     {
         if ($parent == null) {
             $parent = Mage::getSingleton('admin/config')->getAdminhtmlConfig()->getNode('menu');
         }
-        foreach ($parent->children() as $childName=>$child) {
+        foreach ($parent->children() as $childName => $child) {
             $aclResource = 'admin/' . $path . $childName;
             if (Mage::getSingleton('admin/session')->isAllowed($aclResource)) {
                 if (!$child->children) {
                     return (string)$child->action;
                 } else if ($child->children) {
-                    $action = $this->findFirstAvailableMenu($child->children, $path . $childName . '/', $level+1);
+                    $action = $this->findFirstAvailableMenu($child->children, $path . $childName . '/', $level + 1);
                     return $action ? $action : (string)$child->action;
                 }
             }
@@ -398,7 +525,9 @@ class Mage_Admin_Model_User extends Mage_Core_Model_Abstract
                 $errors[] = Mage::helper('adminhtml')->__('Password must be at least of %d characters.', self::MIN_PASSWORD_LENGTH);
             }
 
-            if (!preg_match('/[a-z]/iu', $this->getNewPassword()) || !preg_match('/[0-9]/u', $this->getNewPassword())) {
+            if (!preg_match('/[a-z]/iu', $this->getNewPassword())
+                || !preg_match('/[0-9]/u', $this->getNewPassword())
+            ) {
                 $errors[] = Mage::helper('adminhtml')->__('Password must include both numeric and alphabetic characters.');
             }
 
@@ -415,6 +544,57 @@ class Mage_Admin_Model_User extends Mage_Core_Model_Abstract
             return true;
         }
         return $errors;
+    }
+
+    /**
+     * Change reset password link token
+     *
+     * Stores new reset password link token and its creation time
+     *
+     * @param string $newResetPasswordLinkToken
+     * @return Mage_Admin_Model_User
+     * @throws Mage_Core_Exception
+     */
+    public function changeResetPasswordLinkToken($newResetPasswordLinkToken) {
+        if (!is_string($newResetPasswordLinkToken) || empty($newResetPasswordLinkToken)) {
+            throw Mage::exception('Mage_Core', Mage::helper('adminhtml')->__('Invalid password reset token.'));
+        }
+        $this->setRpToken($newResetPasswordLinkToken);
+        $currentDate = Varien_Date::now();
+        $this->setRpTokenCreatedAt($currentDate);
+
+        return $this;
+    }
+
+    /**
+     * Check if current reset password link token is expired
+     *
+     * @return boolean
+     */
+    public function isResetPasswordLinkTokenExpired()
+    {
+        $resetPasswordLinkToken = $this->getRpToken();
+        $resetPasswordLinkTokenCreatedAt = $this->getRpTokenCreatedAt();
+
+        if (empty($resetPasswordLinkToken) || empty($resetPasswordLinkTokenCreatedAt)) {
+            return true;
+        }
+
+        $tokenExpirationPeriod = Mage::helper('admin')->getResetPasswordLinkExpirationPeriod();
+
+        $currentDate = Varien_Date::now();
+        $currentTimestamp = Varien_Date::toTimestamp($currentDate);
+        $tokenTimestamp = Varien_Date::toTimestamp($resetPasswordLinkTokenCreatedAt);
+        if ($tokenTimestamp > $currentTimestamp) {
+            return true;
+        }
+
+        $dayDifference = floor(($currentTimestamp - $tokenTimestamp) / (24 * 60 * 60));
+        if ($dayDifference >= $tokenExpirationPeriod) {
+            return true;
+        }
+
+        return false;
     }
 
 }

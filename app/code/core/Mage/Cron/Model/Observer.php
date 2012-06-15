@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Cron
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -60,11 +60,15 @@ class Mage_Cron_Model_Observer
         $scheduleLifetime = Mage::getStoreConfig(self::XML_PATH_SCHEDULE_LIFETIME) * 60;
         $now = time();
         $jobsRoot = Mage::getConfig()->getNode('crontab/jobs');
+        $defaultJobsRoot = Mage::getConfig()->getNode('default/crontab/jobs');
 
         foreach ($schedules->getIterator() as $schedule) {
             $jobConfig = $jobsRoot->{$schedule->getJobCode()};
             if (!$jobConfig || !$jobConfig->run) {
-                continue;
+                $jobConfig = $defaultJobsRoot->{$schedule->getJobCode()};
+                if (!$jobConfig || !$jobConfig->run) {
+                    continue;
+                }
             }
 
             $runConfig = $jobConfig->run;
@@ -99,12 +103,19 @@ class Mage_Cron_Model_Observer
                     // another cron started this job intermittently, so skip it
                     continue;
                 }
-                $schedule->setExecutedAt(strftime('%Y-%m-%d %H:%M:%S', time()))
+                /**
+                    though running status is set in tryLockJob we must set it here because the object
+                    was loaded with a pending status and will set it back to pending if we don't set it here
+                 */
+                $schedule
+                    ->setStatus(Mage_Cron_Model_Schedule::STATUS_RUNNING)
+                    ->setExecutedAt(strftime('%Y-%m-%d %H:%M:%S', time()))
                     ->save();
 
                 call_user_func_array($callback, $arguments);
 
-                $schedule->setStatus(Mage_Cron_Model_Schedule::STATUS_SUCCESS)
+                $schedule
+                    ->setStatus(Mage_Cron_Model_Schedule::STATUS_SUCCESS)
                     ->setFinishedAt(strftime('%Y-%m-%d %H:%M:%S', time()));
 
             } catch (Exception $e) {

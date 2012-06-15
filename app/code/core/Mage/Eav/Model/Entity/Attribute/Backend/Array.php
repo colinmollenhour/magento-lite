@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Eav
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -33,12 +33,21 @@
  */
 class Mage_Eav_Model_Entity_Attribute_Backend_Array extends Mage_Eav_Model_Entity_Attribute_Backend_Abstract
 {
+    /**
+     * Prepare data for save
+     *
+     * @param Varien_Object $object
+     * @return Mage_Eav_Model_Entity_Attribute_Backend_Abstract
+     */
     public function beforeSave($object)
     {
-        $data = $object->getData($this->getAttribute()->getAttributeCode());
+        $attributeCode = $this->getAttribute()->getAttributeCode();
+        $data = $object->getData($attributeCode);
         if (is_array($data)) {
-            $object->setData($this->getAttribute()->getAttributeCode(), implode(',', $data));
+            $data = array_filter($data);
+            $object->setData($attributeCode, implode(',', $data));
         }
+
         return parent::beforeSave($object);
     }
 }

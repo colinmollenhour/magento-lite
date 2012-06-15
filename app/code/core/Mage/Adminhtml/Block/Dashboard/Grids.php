@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -59,14 +59,14 @@ class Mage_Adminhtml_Block_Dashboard_Grids extends Mage_Adminhtml_Block_Widget_T
     protected function _prepareLayout()
     {
         // load this active tab statically
-        $this->addTab('reviewed_products', array(
+        $this->addTab('ordered_products', array(
             'label'     => $this->__('Bestsellers'),
             'content'   => $this->getLayout()->createBlock('adminhtml/dashboard_tab_products_ordered')->toHtml(),
             'active'    => true
         ));
 
         // load other tabs with ajax
-        $this->addTab('ordered_products', array(
+        $this->addTab('reviewed_products', array(
             'label'     => $this->__('Most Viewed Products'),
             'url'       => $this->getUrl('*/*/productsViewed', array('_current'=>true)),
             'class'     => 'ajax'

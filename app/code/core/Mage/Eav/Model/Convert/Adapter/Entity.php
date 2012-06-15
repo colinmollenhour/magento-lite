@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Eav
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -146,6 +146,12 @@ class Mage_Eav_Model_Convert_Adapter_Entity
                         'like'      => '%'.$val.'%'
                     );
                     break;
+                case 'startsWith':
+                     $attr = array(
+                         'attribute' => $keyDB,
+                         'like'      => $val.'%'
+                     );
+                     break;
                 case 'fromTo':
                     $attr = array(
                         'attribute' => $keyDB,
@@ -212,12 +218,33 @@ class Mage_Eav_Model_Convert_Adapter_Entity
 
     }
 
+    /**
+     * Add join field
+     *
+     * @param array $joinField   Variable should be have view:
+     *     Example:
+     *         array(
+     *            'alias'     => 'alias_table',
+     *            'attribute' => 'table_name', //table name, must be used path of table like 'module/table_name'
+     *            'field'     => 'field_name', //selected field name (optional)
+     *            //bind main condition
+     *            //left field use for joined table
+     *            //and right field use for main table of collection
+     *            //NOTE: around '=' cannot be used ' ' (space) because on the exploding not use space trimming
+     *            'bind'      => 'self_item_id=other_id',
+     *            'cond'      => 'alias_table.entity_id = e.entity_id', //additional condition (optional)
+     *            'joinType'  => 'LEFT'
+     *         )
+     *     NOTE: Optional key must be have NULL at least
+     * @return void
+     */
     public function setJoinField($joinField)
     {
         if (is_array($joinField)) {
             $this->_joinField[] = $joinField;
         }
     }
+
     public function load()
     {
         if (!($entityType = $this->getVar('entity_type'))
