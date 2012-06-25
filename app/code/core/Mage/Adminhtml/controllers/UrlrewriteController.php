@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -121,15 +121,21 @@ class Mage_Adminhtml_UrlrewriteController extends Mage_Adminhtml_Controller_Acti
         $this->_initRegistry();
 
         if ($data = $this->getRequest()->getPost()) {
+            $session = Mage::getSingleton('adminhtml/session');
             try {
                 // set basic urlrewrite data
                 $model = Mage::registry('current_urlrewrite');
 
+                // Validate request path
+                $requestPath = $this->getRequest()->getParam('request_path');
+                Mage::helper('core/url_rewrite')->validateRequestPath($requestPath);
+
+                // Proceed and save request
                 $model->setIdPath($this->getRequest()->getParam('id_path'))
                     ->setTargetPath($this->getRequest()->getParam('target_path'))
                     ->setOptions($this->getRequest()->getParam('options'))
                     ->setDescription($this->getRequest()->getParam('description'))
-                    ->setRequestPath($this->getRequest()->getParam('request_path'));
+                    ->setRequestPath($requestPath);
 
                 if (!$model->getId()) {
                     $model->setIsSystem(0);
@@ -156,6 +162,10 @@ class Mage_Adminhtml_UrlrewriteController extends Mage_Adminhtml_Controller_Acti
                     if (in_array($model->getOptions(), array('R', 'RP'))) {
                         $rewrite = Mage::getResourceModel('catalog/url')
                             ->getRewriteByIdPath($idPath, $model->getStoreId());
+                        if (!$rewrite) {
+                            $exceptionTxt = 'Chosen product does not associated with the chosen store or category.';
+                            Mage::throwException($exceptionTxt);
+                        }
                         if($rewrite->getId() && $rewrite->getId() != $model->getId()) {
                             $model->setIdPath($idPath);
                             $model->setTargetPath($rewrite->getRequestPath());
@@ -171,17 +181,15 @@ class Mage_Adminhtml_UrlrewriteController extends Mage_Adminhtml_Controller_Acti
 
                 // save and redirect
                 $model->save();
-                Mage::getSingleton('adminhtml/session')->addSuccess(
-                    Mage::helper('adminhtml')->__('The URL Rewrite has been saved.')
-                );
+                $session->addSuccess(Mage::helper('adminhtml')->__('The URL Rewrite has been saved.'));
                 $this->_redirect('*/*/');
                 return;
-            }
-            catch (Exception $e) {
-                Mage::getSingleton('adminhtml/session')
-                    ->addError($e->getMessage())
-                    ->setUrlrewriteData($data)
-                ;
+            } catch (Mage_Core_Exception $e) {
+                $session->addError($e->getMessage())
+                    ->setUrlrewriteData($data);
+            } catch (Exception $e) {
+                $session->addException($e, Mage::helper('adminhtml')->__('An error occurred while saving URL Rewrite.'))
+                    ->setUrlrewriteData($data);
                 // return intentionally omitted
             }
         }
@@ -202,10 +210,10 @@ class Mage_Adminhtml_UrlrewriteController extends Mage_Adminhtml_Controller_Acti
                 Mage::getSingleton('adminhtml/session')->addSuccess(
                     Mage::helper('adminhtml')->__('The URL Rewrite has been deleted.')
                 );
-            }
-            catch (Exception $e) {
-                Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
-                $this->_redirectReferer();
+            } catch (Exception $e) {
+                Mage::getSingleton('adminhtml/session')
+                    ->addException($e, Mage::helper('adminhtml')->__('An error occurred while deleting URL Rewrite.'));
+                $this->_redirect('*/*/edit/', array('id'=>Mage::registry('current_urlrewrite')->getId()));
                 return;
             }
         }

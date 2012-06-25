@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Core
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -33,6 +33,12 @@
  */
 class Mage_Core_Model_Config_Options extends Varien_Object
 {
+    /**
+     * Var directory
+     *
+     * @var string
+     */
+    const VAR_DIRECTORY = 'var';
     /**
      * Flag cache for existing or already created directories
      *
@@ -138,7 +144,8 @@ class Mage_Core_Model_Config_Options extends Varien_Object
     public function getVarDir()
     {
         //$dir = $this->getDataSetDefault('var_dir', $this->getBaseDir().DS.'var');
-        $dir = isset($this->_data['var_dir']) ? $this->_data['var_dir'] : $this->_data['base_dir'].DS.'var';
+        $dir = isset($this->_data['var_dir']) ? $this->_data['var_dir']
+            : $this->_data['base_dir'] . DS . self::VAR_DIRECTORY;
         if (!$this->createDirIfNotExists($dir)) {
             $dir = $this->getSysTmpDir().DS.'magento'.DS.'var';
             if (!$this->createDirIfNotExists($dir)) {
@@ -214,9 +221,11 @@ class Mage_Core_Model_Config_Options extends Varien_Object
                 return false;
             }
         } else {
+            $oldUmask = umask(0);
             if (!@mkdir($dir, 0777, true)) {
                 return false;
             }
+            umask($oldUmask);
         }
         $this->_dirExists[$dir] = true;
         return true;

@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -35,12 +35,19 @@
 class Mage_Adminhtml_Block_Widget_Grid_Container extends Mage_Adminhtml_Block_Widget_Container
 {
 
-    protected $_addButtonLabel = 'Add New';
-    protected $_backButtonLabel = 'Back';
+    protected $_addButtonLabel;
+    protected $_backButtonLabel;
     protected $_blockGroup = 'adminhtml';
 
     public function __construct()
     {
+        if (is_null($this->_addButtonLabel)) {
+            $this->_addButtonLabel = $this->__('Add New');
+        }
+        if(is_null($this->_backButtonLabel)) {
+            $this->_backButtonLabel = $this->__('Back');
+        }
+
         parent::__construct();
 
         $this->setTemplate('widget/grid/container.phtml');

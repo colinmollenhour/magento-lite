@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -73,6 +73,20 @@ class Mage_Adminhtml_Block_Widget_Tabs extends Mage_Adminhtml_Block_Widget
     {
         $this->_destElementId = $elementId;
         return $this;
+    }
+
+    /**
+     * Add new tab after another
+     *
+     * @param   string $tabId new tab Id
+     * @param   array|Varien_Object $tab
+     * @param   string $afterTabId
+     * @return  Mage_Adminhtml_Block_Widget_Tabs
+     */
+    public function addTabAfter($tabId, $tab, $afterTabId)
+    {
+        $this->addTab($tabId, $tab);
+        $this->_tabs[$tabId]->setAfter($afterTabId);
     }
 
     /**

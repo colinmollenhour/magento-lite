@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -44,13 +44,6 @@ class Mage_Adminhtml_Model_Giftmessage_Save extends Varien_Object
     public function saveAllInQuote()
     {
         $giftmessages = $this->getGiftmessages();
-
-        // remove disabled giftmessages
-        foreach ($this->_getQuote()->getAllItems() as $item) {
-            if($item->getGiftMessageId() && !in_array($item->getId(), $this->getAllowQuoteItems())) {
-                $this->_deleteOne($item);
-            }
-        }
 
         if (!is_array($giftmessages)) {
             return $this;
@@ -91,24 +84,28 @@ class Mage_Adminhtml_Model_Giftmessage_Save extends Varien_Object
      * @return Mage_Adminhtml_Model_Giftmessage_Save
      */
     protected function _saveOne($entityId, $giftmessage) {
+        /* @var $giftmessageModel Mage_Giftmessage_Model_Message */
         $giftmessageModel = Mage::getModel('giftmessage/message');
+        $entityType = $this->_getMappedType($giftmessage['type']);
 
-        if ($this->_getMappedType($giftmessage['type'])!='quote_item') {
-            $entityModel = $giftmessageModel->getEntityModelByType($this->_getMappedType($giftmessage['type']));
-        } else {
-            $entityModel = $this->_getQuote()->getItemById($entityId);
+        switch($entityType) {
+            case 'quote':
+                $entityModel = $this->_getQuote();
+                break;
+
+            case 'quote_item':
+                $entityModel = $this->_getQuote()->getItemById($entityId);
+                break;
+
+            default:
+                $entityModel = $giftmessageModel->getEntityModelByType($entityType)
+                    ->load($entityId);
+                break;
         }
 
-
-
-        if ($this->_getMappedType($giftmessage['type'])=='quote') {
-            $entityModel->setStoreId($this->_getQuote()->getStoreId());
+        if (!$entityModel) {
+            return $this;
         }
-
-        if ($this->_getMappedType($giftmessage['type'])!='quote_item') {
-            $entityModel->load($entityId);
-        }
-
 
         if ($entityModel->getGiftMessageId()) {
             $giftmessageModel->load($entityModel->getGiftMessageId());
@@ -122,8 +119,10 @@ class Mage_Adminhtml_Model_Giftmessage_Save extends Varien_Object
             $this->_saved = false;
         } elseif (!$giftmessageModel->isMessageEmpty()) {
             $giftmessageModel->save();
-            $entityModel->setGiftMessageId($giftmessageModel->getId())
-                ->save();
+            $entityModel->setGiftMessageId($giftmessageModel->getId());
+            if($entityType != 'quote') {
+                $entityModel->save();
+            }
             $this->_saved = true;
         }
 

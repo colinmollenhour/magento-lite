@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Page
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -465,5 +465,51 @@ class Mage_Page_Block_Html_Head extends Mage_Core_Block_Template
             $this->_data['includes'] = Mage::getStoreConfig('design/head/includes');
         }
         return $this->_data['includes'];
+    }
+
+    /**
+     * Getter for path to Favicon
+     *
+     * @return string
+     */
+    public function getFaviconFile()
+    {
+        if (empty($this->_data['favicon_file'])) {
+            $this->_data['favicon_file'] = $this->_getFaviconFile();
+        }
+        return $this->_data['favicon_file'];
+    }
+
+    /**
+     * Retrieve path to Favicon
+     *
+     * @return string
+     */
+    protected function _getFaviconFile()
+    {
+        $folderName = Mage_Adminhtml_Model_System_Config_Backend_Image_Favicon::UPLOAD_DIR;
+        $storeConfig = Mage::getStoreConfig('design/head/shortcut_icon');
+        $faviconFile = Mage::getBaseUrl('media') . $folderName . '/' . $storeConfig;
+        $absolutePath = Mage::getBaseDir('media') . '/' . $folderName . '/' . $storeConfig;
+
+        if(!is_null($storeConfig) && $this->_isFile($absolutePath)) {
+            $url = $faviconFile;
+        } else {
+            $url = $this->getSkinUrl('favicon.ico');
+        }
+        return $url;
+    }
+
+    /**
+     * If DB file storage is on - find there, otherwise - just file_exists
+     *
+     * @param string $filename
+     * @return bool
+     */
+    protected function _isFile($filename) {
+        if (Mage::helper('core/file_storage_database')->checkDbUsage() && !is_file($filename)) {
+            Mage::helper('core/file_storage_database')->saveFileToFilesystem($filename);
+        }
+        return is_file($filename);
     }
 }

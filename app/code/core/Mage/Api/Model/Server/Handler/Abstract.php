@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Api
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -38,6 +38,7 @@ abstract class Mage_Api_Model_Server_Handler_Abstract
     public function __construct()
     {
         set_error_handler(array($this, 'handlePhpError'), E_ALL);
+        Mage::app()->loadAreaPart(Mage_Core_Model_App_Area::AREA_ADMINHTML, Mage_Core_Model_App_Area::PART_EVENTS);
     }
 
     public function handlePhpError($errorCode, $errorMessage, $errorFile)
@@ -109,7 +110,7 @@ abstract class Mage_Api_Model_Server_Handler_Abstract
     /**
      *  Check session expiration
      *
-     *  @return	  boolean
+     *  @return  boolean
      */
     protected function _isSessionExpired ()
     {
@@ -209,10 +210,14 @@ abstract class Mage_Api_Model_Server_Handler_Abstract
      * @param string $apiKey
      * @return string
      */
-    public function login($username, $apiKey)
+    public function login($username, $apiKey = null)
     {
-        $this->_startSession();
+        if (empty($username) || empty($apiKey)) {
+            return $this->_fault('invalid_request_param');
+        }
+
         try {
+            $this->_startSession();
             $this->_getSession()->login($username, $apiKey);
         } catch (Exception $e) {
             return $this->_fault('access_denied');
@@ -224,7 +229,7 @@ abstract class Mage_Api_Model_Server_Handler_Abstract
      * Call resource functionality
      *
      * @param string $sessionId
-     * @param string $resourcePath
+     * @param string $apiPath
      * @param array  $args
      * @return mixed
      */
@@ -436,6 +441,11 @@ abstract class Mage_Api_Model_Server_Handler_Abstract
     public function resources($sessionId)
     {
         $this->_startSession($sessionId);
+
+        if (!$this->_getSession()->isLoggedIn($sessionId)) {
+            return $this->_fault('session_expired');
+        }
+
         $resources = array();
 
         $resourcesAlias = array();
@@ -496,6 +506,10 @@ abstract class Mage_Api_Model_Server_Handler_Abstract
     public function resourceFaults($sessionId, $resourceName)
     {
         $this->_startSession($sessionId);
+
+        if (!$this->_getSession()->isLoggedIn($sessionId)) {
+            return $this->_fault('session_expired');
+        }
 
         $resourcesAlias = $this->_getConfig()->getResourcesAlias();
         $resources      = $this->_getConfig()->getResources();

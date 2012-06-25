@@ -19,7 +19,7 @@
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
@@ -41,15 +41,23 @@ Ajax.Request.addMethods({
         if (!url.match(new RegExp('[?&]isAjax=true',''))) {
             url = url.match(new RegExp('\\?',"g")) ? url + '&isAjax=true' : url + '?isAjax=true';
         }
-        if (!this.options.parameters) {
-            this.options.parameters = {
+        if (Object.isString(this.options.parameters)
+            && this.options.parameters.indexOf('form_key=') == -1
+        ) {
+            this.options.parameters += '&' + Object.toQueryString({
                 form_key: FORM_KEY
-            };
+            });
+        } else {
+            if (!this.options.parameters) {
+                this.options.parameters = {
+                    form_key: FORM_KEY
+                };
+            }
+            if (!this.options.parameters.form_key) {
+                this.options.parameters.form_key = FORM_KEY;
+            }
         }
-        if (!this.options.parameters.form_key) {
-            this.options.parameters.form_key = FORM_KEY;
-        }
-        
+
         this.request(url);
     },
     respondToReadyState: function(readyState) {
@@ -217,9 +225,12 @@ varienLoaderHandler.handler = {
 function setLoaderPosition(){
     var elem = $('loading_mask_loader');
     if (elem && Prototype.Browser.IE) {
-        var middle = parseInt(document.body.clientHeight/2)+document.body.scrollTop;
+        var elementDims = elem.getDimensions();
+        var viewPort = document.viewport.getDimensions();
+        var offsets = document.viewport.getScrollOffsets();
+        elem.style.left = Math.floor(viewPort.width / 2 + offsets.left - elementDims.width / 2) + 'px';
+        elem.style.top = Math.floor(viewPort.height / 2 + offsets.top - elementDims.height / 2) + 'px';
         elem.style.position = 'absolute';
-        elem.style.top = middle;
     }
 }
 

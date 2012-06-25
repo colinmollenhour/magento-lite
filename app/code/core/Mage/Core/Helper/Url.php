@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Core
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -41,7 +41,18 @@ class Mage_Core_Helper_Url extends Mage_Core_Helper_Abstract
      */
     public function getCurrentUrl()
     {
-        return $this->_getUrl('*/*/*', array('_current' => true, '_use_rewrite' => true));
+        $request = Mage::app()->getRequest();
+        $port = $request->getServer('SERVER_PORT');
+        if ($port) {
+            $defaultPorts = array(
+                Mage_Core_Controller_Request_Http::DEFAULT_HTTP_PORT,
+                Mage_Core_Controller_Request_Http::DEFAULT_HTTPS_PORT
+            );
+            $port = (in_array($port, $defaultPorts)) ? '' : ':' . $port;
+        }
+        $url = $request->getScheme() . '://' . $request->getHttpHost() . $port . $request->getServer('REQUEST_URI');
+        return $url;
+//        return $this->_getUrl('*/*/*', array('_current' => true, '_use_rewrite' => true));
     }
 
     /**
@@ -81,4 +92,55 @@ class Mage_Core_Helper_Url extends Mage_Core_Helper_Abstract
         return $string;
     }
 
+    /**
+     * Add request parameter into url
+     *
+     * @param  $url string
+     * @param  $param array( 'key' => value )
+     * @return string
+     */
+    public function addRequestParam($url, $param)
+    {
+        $startDelimiter = (false === strpos($url,'?'))? '?' : '&';
+
+        $arrQueryParams = array();
+        foreach($param as $key=>$value) {
+            if (is_numeric($key) || is_object($value)) {
+                continue;
+            }
+
+            if (is_array($value)) {
+                // $key[]=$value1&$key[]=$value2 ...
+                $arrQueryParams[] = $key . '[]=' . implode('&' . $key . '[]=', $value);
+            } elseif (is_null($value)) {
+                $arrQueryParams[] = $key;
+            } else {
+                $arrQueryParams[] = $key . '=' . $value;
+            }
+        }
+        $url .= $startDelimiter . implode('&', $arrQueryParams);
+
+        return $url;
+    }
+
+    /**
+     * Remove request parameter from url
+     *
+     * @param string $url
+     * @param string $paramKey
+     * @return string
+     */
+    public function removeRequestParam($url, $paramKey, $caseSensitive = false)
+    {
+        $regExpression = '/\\?[^#]*?(' . preg_quote($paramKey, '/') . '\\=[^#&]*&?)/' . ($caseSensitive ? '' : 'i');
+        while (preg_match($regExpression, $url, $mathes) != 0) {
+            $paramString = $mathes[1];
+            if (preg_match('/&$/', $paramString) == 0) {
+                $url = preg_replace('/(&|\\?)?' . preg_quote($paramString, '/') . '/', '', $url);
+            } else {
+                $url = str_replace($paramString, '', $url);
+            }
+        }
+        return $url;
+    }
 }

@@ -20,17 +20,16 @@
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
-
 
 /**
  * Images manage controller for Cms WYSIWYG editor
  *
- * @category   Mage
- * @package    Mage_Adminhtml
- * @author     Magento Core Team <core@magentocommerce.com>
+ * @category    Mage
+ * @package     Mage_Adminhtml
+ * @author      Magento Core Team <core@magentocommerce.com>
  */
 class Mage_Adminhtml_Cms_Wysiwyg_ImagesController extends Mage_Adminhtml_Controller_Action
 {
@@ -111,15 +110,30 @@ class Mage_Adminhtml_Cms_Wysiwyg_ImagesController extends Mage_Adminhtml_Control
         }
     }
 
+    /**
+     * Delete file from media storage
+     *
+     * @return void
+     */
     public function deleteFilesAction()
     {
-        $files = Mage::helper('core')->jsonDecode($this->getRequest()->getParam('files'));
         try {
+            if (!$this->getRequest()->isPost()) {
+                throw new Exception ('Wrong request.');
+            }
+            $files = Mage::helper('core')->jsonDecode($this->getRequest()->getParam('files'));
+
+            /** @var $helper Mage_Cms_Helper_Wysiwyg_Images */
             $helper = Mage::helper('cms/wysiwyg_images');
             $path = $this->getStorage()->getSession()->getCurrentPath();
             foreach ($files as $file) {
                 $file = $helper->idDecode($file);
-                $this->getStorage()->deleteFile($path . DS . $file);
+                $_filePath = realpath($path . DS . $file);
+                if (strpos($_filePath, realpath($path)) === 0 &&
+                    strpos($_filePath, realpath($helper->getStorageRoot())) === 0
+                ) {
+                    $this->getStorage()->deleteFile($path . DS . $file);
+                }
             }
         } catch (Exception $e) {
             $result = array('error' => true, 'message' => $e->getMessage());
@@ -155,7 +169,7 @@ class Mage_Adminhtml_Cms_Wysiwyg_ImagesController extends Mage_Adminhtml_Control
         $filename = $this->getRequest()->getParam('filename');
         $filename = $helper->idDecode($filename);
         $asIs = $this->getRequest()->getParam('as_is');
-        
+
         Mage::helper('catalog')->setStoreId($storeId);
         $helper->setStoreId($storeId);
 
@@ -183,7 +197,7 @@ class Mage_Adminhtml_Cms_Wysiwyg_ImagesController extends Mage_Adminhtml_Control
     /**
      * Register storage model and return it
      *
-     * @return Mage_Cms_Model_Page_Wysiwyg_Images_Storage
+     * @return Mage_Cms_Model_Wysiwyg_Images_Storage
      */
     public function getStorage()
     {
@@ -205,5 +219,15 @@ class Mage_Adminhtml_Cms_Wysiwyg_ImagesController extends Mage_Adminhtml_Control
             ->getSession()
             ->setCurrentPath(Mage::helper('cms/wysiwyg_images')->getCurrentPath());
         return $this;
+    }
+
+    /**
+     * Check current user permission on resource and privilege
+     *
+     * @return bool
+     */
+    protected function _isAllowed()
+    {
+        return Mage::getSingleton('admin/session')->isAllowed('cms/media_gallery');
     }
 }

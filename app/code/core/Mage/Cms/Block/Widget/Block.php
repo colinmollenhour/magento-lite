@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Cms
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -35,7 +35,15 @@
 class Mage_Cms_Block_Widget_Block extends Mage_Core_Block_Template implements Mage_Widget_Block_Interface
 {
     /**
+     * Storage for used widgets
+     *
+     * @var array
+     */
+    static protected $_widgetUsageMap = array();
+
+    /**
      * Prepare block text and determine whether block output enabled or not
+     * Prevent blocks recursion if needed
      *
      * @return Mage_Cms_Block_Widget_Block
      */
@@ -43,6 +51,13 @@ class Mage_Cms_Block_Widget_Block extends Mage_Core_Block_Template implements Ma
     {
         parent::_beforeToHtml();
         $blockId = $this->getData('block_id');
+        $blockHash = get_class($this) . $blockId;
+
+        if (isset(self::$_widgetUsageMap[$blockHash])) {
+            return $this;
+        }
+        self::$_widgetUsageMap[$blockHash] = true;
+
         if ($blockId) {
             $block = Mage::getModel('cms/block')
                 ->setStoreId(Mage::app()->getStore()->getId())
@@ -54,6 +69,8 @@ class Mage_Cms_Block_Widget_Block extends Mage_Core_Block_Template implements Ma
                 $this->setText($processor->filter($block->getContent()));
             }
         }
+
+        unset(self::$_widgetUsageMap[$blockHash]);
         return $this;
     }
 }

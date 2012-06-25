@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Index
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -31,6 +31,21 @@
 abstract class Mage_Index_Model_Indexer_Abstract extends Mage_Core_Model_Abstract
 {
     protected $_matchedEntities = array();
+
+    /**
+     * Whether table changes are allowed
+     *
+     * @deprecated after 1.6.1.0
+     * @var bool
+     */
+    protected $_allowTableChanges = true;
+
+    /**
+     * Whether the indexer should be displayed on process/list page
+     *
+     * @var bool
+     */
+    protected $_isVisible = true;
 
     /**
      * Get Indexer name
@@ -44,7 +59,10 @@ abstract class Mage_Index_Model_Indexer_Abstract extends Mage_Core_Model_Abstrac
      *
      * @return string
      */
-    abstract public function getDescription();
+    public function getDescription()
+    {
+        return '';
+    }
 
     /**
      * Register indexer required data inside event object
@@ -140,9 +158,73 @@ abstract class Mage_Index_Model_Indexer_Abstract extends Mage_Core_Model_Abstrac
             $method = $this->_camelize($event->getType());
         }
 
-        if (method_exists($this->_getResource(), $method)) {
-            $this->_getResource()->$method($event);
+        $resourceModel = $this->_getResource();
+        if (method_exists($resourceModel, $method)) {
+            $resourceModel->$method($event);
         }
         return $this;
+    }
+
+    /**
+     * Set whether table changes are allowed
+     *
+     * @deprecated after 1.6.1.0
+     * @param bool $value
+     * @return Mage_Index_Model_Indexer_Abstract
+     */
+    public function setAllowTableChanges($value = true)
+    {
+        $this->_allowTableChanges = $value;
+        return $this;
+    }
+
+    /**
+     * Disable resource table keys
+     *
+     * @return Mage_Index_Model_Indexer_Abstract
+     */
+    public function disableKeys()
+    {
+        if (empty($this->_resourceName)) {
+            return $this;
+        }
+
+        $resourceModel = $this->getResource();
+        if ($resourceModel instanceof Mage_Index_Model_Resource_Abstract) {
+            $resourceModel->useDisableKeys(true);
+            $resourceModel->disableTableKeys();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Enable resource table keys
+     *
+     * @return Mage_Index_Model_Indexer_Abstract
+     */
+    public function enableKeys()
+    {
+        if (empty($this->_resourceName)) {
+            return $this;
+        }
+
+        $resourceModel = $this->getResource();
+        if ($resourceModel instanceof Mage_Index_Model_Resource_Abstract) {
+            $resourceModel->useDisableKeys(true);
+            $resourceModel->enableTableKeys();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Whether the indexer should be displayed on process/list page
+     *
+     * @return bool
+     */
+    public function isVisible()
+    {
+        return $this->_isVisible;
     }
 }

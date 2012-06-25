@@ -21,7 +21,7 @@
  *
  * @category    Mage
  * @package     Mage_Compiler
- * @copyright   Copyright (c) 2009 Irubin Consulting Inc. DBA Varien (http://www.varien.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 -->
@@ -55,7 +55,7 @@
                         <compiler translate="title" module="compiler">
                             <title>Compilation</title>
                             <sort_order>1000</sort_order>
-                            <action>compiler/process</action>
+                            <action>adminhtml/compiler_process</action>
                         </compiler>
                     </children>
                 </tools>
