@@ -28,6 +28,11 @@ class Mage_Adminhtml_Block_Dashboard extends Mage_Adminhtml_Block_Template
 {
     protected $_locale;
 
+    /**
+     * Location of the "Enable Chart" config param
+     */
+    const XML_PATH_ENABLE_CHARTS = 'admin/dashboard/enable_charts';
+
     public function __construct()
     {
         parent::__construct();

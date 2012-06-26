@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Core
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -101,7 +101,12 @@ class Mage_Core_Controller_Varien_Router_Standard extends Mage_Core_Controller_V
         return true;
     }
 
-
+    /**
+     * Match the request
+     *
+     * @param Zend_Controller_Request_Http $request
+     * @return boolean
+     */
     public function match(Zend_Controller_Request_Http $request)
     {
         //checking before even try to find out that current module
@@ -117,9 +122,8 @@ class Mage_Core_Controller_Varien_Router_Standard extends Mage_Core_Controller_V
 
         if ($path) {
             $p = explode('/', $path);
-        }
-        else {
-            $p = explode('/', Mage::getStoreConfig('web/default/front'));
+        } else {
+            $p = explode('/', $this->_getDefaultPath());
         }
 
         // get module name
@@ -130,7 +134,7 @@ class Mage_Core_Controller_Varien_Router_Standard extends Mage_Core_Controller_V
                 $module = $p[0];
             } else {
                 $module = $this->getFront()->getDefault('module');
-                $request->setAlias(Mage_Core_Model_Url_Rewrite::REWRITE_REQUEST_PATH_ALIAS,	'');
+                $request->setAlias(Mage_Core_Model_Url_Rewrite::REWRITE_REQUEST_PATH_ALIAS, '');
             }
         }
         if (!$module) {
@@ -146,20 +150,11 @@ class Mage_Core_Controller_Varien_Router_Standard extends Mage_Core_Controller_V
          */
         $modules = $this->getModuleByFrontName($module);
 
-        /**
-         * If we did not found anything  we searching exact this module
-         * name in array values
-         */
         if ($modules === false) {
-            if ($moduleFrontName = $this->getModuleByName($module, $this->_modules)) {
-                $modules = array($module);
-                $module = $moduleFrontName;
-            } else {
-                return false;
-            }
+            return false;
         }
 
-        //checkings after we foundout that this router should be used for current module
+        // checks after we found out that this router should be used for current module
         if (!$this->_afterModuleMatch()) {
             return false;
         }
@@ -215,7 +210,7 @@ class Mage_Core_Controller_Varien_Router_Standard extends Mage_Core_Controller_V
         }
 
         /**
-         * if we did not found any siutibul
+         * if we did not found any suitable
          */
         if (!$found) {
             if ($this->_noRouteShouldBeApplied()) {
@@ -228,7 +223,8 @@ class Mage_Core_Controller_Varien_Router_Standard extends Mage_Core_Controller_V
                 }
 
                 // instantiate controller class
-                $controllerInstance = Mage::getControllerInstance($controllerClassName, $request, $front->getResponse());
+                $controllerInstance = Mage::getControllerInstance($controllerClassName, $request,
+                    $front->getResponse());
 
                 if (!$controllerInstance->hasAction($action)) {
                     return false;
@@ -245,8 +241,8 @@ class Mage_Core_Controller_Varien_Router_Standard extends Mage_Core_Controller_V
         $request->setControllerModule($realModule);
 
         // set parameters from pathinfo
-        for ($i=3, $l=sizeof($p); $i<$l; $i+=2) {
-            $request->setParam($p[$i], isset($p[$i+1]) ? $p[$i+1] : '');
+        for ($i = 3, $l = sizeof($p); $i < $l; $i += 2) {
+            $request->setParam($p[$i], isset($p[$i+1]) ? urldecode($p[$i+1]) : '');
         }
 
         // dispatch action
@@ -254,6 +250,15 @@ class Mage_Core_Controller_Varien_Router_Standard extends Mage_Core_Controller_V
         $controllerInstance->dispatch($action);
 
         return true;
+    }
+
+    /**
+     * Get router default request path
+     * @return string
+     */
+    protected function _getDefaultPath()
+    {
+        return Mage::getStoreConfig('web/default/front');
     }
 
     /**
@@ -407,18 +412,29 @@ class Mage_Core_Controller_Varien_Router_Standard extends Mage_Core_Controller_V
                 $p[2] = trim((string)$action);
             }
         }
-#echo "<pre>".print_r($p,1)."</pre>";
+
         return $p;
     }
 
-    protected function _checkShouldBeSecure($request, $path='')
+    /**
+     * Check that request uses https protocol if it should.
+     * Function redirects user to correct URL if needed.
+     *
+     * @param Mage_Core_Controller_Request_Http $request
+     * @param string $path
+     * @return void
+     */
+    protected function _checkShouldBeSecure($request, $path = '')
     {
         if (!Mage::isInstalled() || $request->getPost()) {
             return;
         }
 
-        if ($this->_shouldBeSecure($path) && !Mage::app()->getStore()->isCurrentlySecure()) {
+        if ($this->_shouldBeSecure($path) && !$request->isSecure()) {
             $url = $this->_getCurrentSecureUrl($request);
+            if ($request->getRouteName() != 'adminhtml' && Mage::app()->getUseSessionInUrl()) {
+                $url = Mage::getSingleton('core/url')->getRedirectUrl($url);
+            }
 
             Mage::app()->getFrontController()->getResponse()
                 ->setRedirect($url)
@@ -436,11 +452,17 @@ class Mage_Core_Controller_Varien_Router_Standard extends Mage_Core_Controller_V
         return Mage::getBaseUrl('link', true).ltrim($request->getPathInfo(), '/');
     }
 
+    /**
+     * Check whether URL for corresponding path should use https protocol
+     *
+     * @param string $path
+     * @return bool
+     */
     protected function _shouldBeSecure($path)
     {
-        return substr(Mage::getStoreConfig('web/unsecure/base_url'),0,5)==='https'
+        return substr(Mage::getStoreConfig('web/unsecure/base_url'), 0, 5) === 'https'
             || Mage::getStoreConfigFlag('web/secure/use_in_frontend')
-            && substr(Mage::getStoreConfig('web/secure/base_url'),0,5)=='https'
-            && Mage::getConfig()->shouldUrlBeSecure($path);
+                && substr(Mage::getStoreConfig('web/secure/base_url'), 0, 5) == 'https'
+                && Mage::getConfig()->shouldUrlBeSecure($path);
     }
 }

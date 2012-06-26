@@ -21,15 +21,15 @@
  *
  * @category    design
  * @package     default_default
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 -->
 
 <layout>
-    <compiler_process_index>
+    <adminhtml_compiler_process_index>
         <reference name="content">
             <block type="compiler/process" name="compiler_process" template="compiler/process.phtml"></block>
         </reference>
-    </compiler_process_index>
+    </adminhtml_compiler_process_index>
 </layout>

@@ -245,7 +245,7 @@ class Varien_Io_File extends Varien_Io_Abstract
             $this->streamUnlock();
         }
         @fclose($this->_streamHandler);
-        @chmod($this->_streamFileName, $this->_streamChmod);
+        $this->chmod($this->_streamFileName, $this->_streamChmod);
         return true;
     }
 
@@ -510,7 +510,7 @@ class Varien_Io_File extends Varien_Io_Abstract
     {
         preg_match('/^(.*[!\/])/', $filepath, $mathces);
         if (isset($mathces[0])) {
-        	return $mathces[0];
+            return $mathces[0];
         }
         return false;
     }
@@ -544,7 +544,7 @@ class Varien_Io_File extends Varien_Io_Abstract
         if (!is_dir(dirname($folder))) {
             $this->checkAndCreateFolder(dirname($folder), $mode);
         }
-        if (!is_dir($folder) && !@mkdir($folder, $mode)) {
+        if (!is_dir($folder) && !$this->mkdir($folder, $mode)) {
             throw new Exception("Unable to create directory '{$folder}'. Access forbidden.");
         }
         return true;
@@ -560,7 +560,6 @@ class Varien_Io_File extends Varien_Io_Abstract
         if (!(@is_dir($destinationFolder) || $this->mkdir($destinationFolder, 0777, true))) {
             throw new Exception("Unable to create directory '{$destinationFolder}'.");
         }
-//        return $this;
 
         $destinationFolder = str_replace('/', DIRECTORY_SEPARATOR, $destinationFolder);
         $path = explode(DIRECTORY_SEPARATOR, $destinationFolder);

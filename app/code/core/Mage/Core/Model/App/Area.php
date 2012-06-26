@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Core
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -34,10 +34,11 @@ class Mage_Core_Model_App_Area
     const AREA_GLOBAL   = 'global';
     const AREA_FRONTEND = 'frontend';
     const AREA_ADMIN    = 'admin';
+    const AREA_ADMINHTML = 'adminhtml';
 
     const PART_CONFIG   = 'config';
     const PART_EVENTS   = 'events';
-    const PART_TRANSLATE= 'translate';
+    const PART_TRANSLATE = 'translate';
     const PART_DESIGN   = 'design';
 
     /**

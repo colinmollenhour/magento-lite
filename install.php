@@ -83,6 +83,7 @@
  * --db_host                    // required, You can specify server port, ex.: localhost:3307
  *                              // If you are not using default UNIX socket, you can specify it
  *                              // here instead of host, ex.: /var/run/mysqld/mysqld.sock
+ * --db_model                   // Database type (mysql4 by default)
  * --db_name                    // required, Database Name
  * --db_user                    // required, Database User Name
  * --db_pass                    // required, Database User Password
@@ -103,6 +104,8 @@
  *                              // Provide a complete base URL for SSL connection.
  *                              // For example: https://www.mydomain.com/magento/
  * --use_secure_admin           // optional, Run admin interface with SSL
+ * Backend interface options:
+ * --enable_charts              // optional, Enables Charts on the backend's dashboard
  * Admin user personal information:
  * --admin_lastname             // required, admin user last name
  * --admin_firstname            // required, admin user first name
@@ -149,4 +152,4 @@ if ($installer instanceof Mage_Install_Model_Installer_Console) {
         }
     }
 }
-exit; // dont delete this
+exit(1); // don't delete this as this should notify about failed installation

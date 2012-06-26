@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Directory
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -109,7 +109,7 @@ class Mage_Directory_Block_Data extends Mage_Core_Block_Template
             ->setTitle(Mage::helper('directory')->__('State/Province'))
             ->setId('state')
             ->setClass('required-entry validate-state')
-            ->setValue($this->getRegionId())
+            ->setValue(intval($this->getRegionId()))
             ->setOptions($options)
             ->getHtml();
         Varien_Profiler::start('TEST: '.__METHOD__);
@@ -120,7 +120,7 @@ class Mage_Directory_Block_Data extends Mage_Core_Block_Template
     {
         $countryId = $this->getData('country_id');
         if (is_null($countryId)) {
-            $countryId = Mage::getStoreConfig('general/country/default');
+            $countryId = Mage::helper('core')->getDefaultCountry();
         }
         return $countryId;
     }

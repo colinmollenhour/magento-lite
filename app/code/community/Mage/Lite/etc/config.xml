@@ -46,6 +46,20 @@
         </observers>
       </controller_action_predispatch>
     </events>
+    <global_search>
+      <products>
+        <class><![CDATA[0]]></class>
+        <acl>catalog</acl>
+      </products>
+      <customers>
+        <class><![CDATA[0]]></class>
+        <acl>customer</acl>
+      </customers>
+      <sales>
+        <class><![CDATA[0]]></class>
+        <acl>sales</acl>
+      </sales>
+    </global_search>
     <layout>
       <updates>
         <magelite module="Mage_Lite">

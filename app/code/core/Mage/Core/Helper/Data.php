@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Core
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -31,10 +31,47 @@
  */
 class Mage_Core_Helper_Data extends Mage_Core_Helper_Abstract
 {
+    const XML_PATH_DEFAULT_COUNTRY              = 'general/country/default';
+    const XML_PATH_PROTECTED_FILE_EXTENSIONS    = 'general/file/protected_extensions';
+    const XML_PATH_PUBLIC_FILES_VALID_PATHS     = 'general/file/public_files_valid_paths';
+    const XML_PATH_ENCRYPTION_MODEL             = 'global/helpers/core/encryption_model';
+    const XML_PATH_DEV_ALLOW_IPS                = 'dev/restrict/allow_ips';
+    const XML_PATH_CACHE_BETA_TYPES             = 'global/cache/betatypes';
+    const XML_PATH_CONNECTION_TYPE              = 'global/resources/default_setup/connection/type';
+
+    const CHARS_LOWERS                          = 'abcdefghijklmnopqrstuvwxyz';
+    const CHARS_UPPERS                          = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const CHARS_DIGITS                          = '0123456789';
+    const CHARS_SPECIALS                        = '!$*+-.=?@^_|~';
+    const CHARS_PASSWORD_LOWERS                 = 'abcdefghjkmnpqrstuvwxyz';
+    const CHARS_PASSWORD_UPPERS                 = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
+    const CHARS_PASSWORD_DIGITS                 = '23456789';
+    const CHARS_PASSWORD_SPECIALS               = '!$*-.=?@_';
+
+    /**
+     * Config pathes to merchant country code and merchant VAT number
+     */
+    const XML_PATH_MERCHANT_COUNTRY_CODE = 'general/store_information/merchant_country';
+    const XML_PATH_MERCHANT_VAT_NUMBER = 'general/store_information/merchant_vat_number';
+    const XML_PATH_EU_COUNTRIES_LIST = 'general/country/eu_countries';
+
+    /**
+     * Const for correct dividing decimal values
+     */
+    const DIVIDE_EPSILON = 10000;
+
     /**
      * @var Mage_Core_Model_Encryption
      */
     protected $_encryptor = null;
+
+    protected $_allowedFormats = array(
+        Mage_Core_Model_Locale::FORMAT_TYPE_FULL,
+        Mage_Core_Model_Locale::FORMAT_TYPE_LONG,
+        Mage_Core_Model_Locale::FORMAT_TYPE_MEDIUM,
+        Mage_Core_Model_Locale::FORMAT_TYPE_SHORT
+    );
+
 
     /**
      * @return Mage_Core_Model_Encryption
@@ -42,7 +79,7 @@ class Mage_Core_Helper_Data extends Mage_Core_Helper_Abstract
     public function getEncryptor()
     {
         if ($this->_encryptor === null) {
-            $encryptionModel = (string)Mage::getConfig()->getNode('global/helpers/core/encryption_model');
+            $encryptionModel = (string)Mage::getConfig()->getNode(self::XML_PATH_ENCRYPTION_MODEL);
             if ($encryptionModel) {
                 $this->_encryptor = new $encryptionModel;
             } else {
@@ -62,14 +99,33 @@ class Mage_Core_Helper_Data extends Mage_Core_Helper_Abstract
      * @param   bool $includeContainer
      * @return  mixed
      */
-    public static function currency($value, $format=true, $includeContainer = true)
+    public static function currency($value, $format = true, $includeContainer = true)
+    {
+        return self::currencyByStore($value, null, $format, $includeContainer);
+    }
+
+    /**
+     * Convert and format price value for specified store
+     *
+     * @param   float $value
+     * @param   int|Mage_Core_Model_Store $store
+     * @param   bool $format
+     * @param   bool $includeContainer
+     * @return  mixed
+     */
+    public static function currencyByStore($value, $store = null, $format = true, $includeContainer = true)
     {
         try {
-            $value = Mage::app()->getStore()->convertPrice($value, $format, $includeContainer);
+            if (!($store instanceof Mage_Core_Model_Store)) {
+                $store = Mage::app()->getStore($store);
+            }
+
+            $value = $store->convertPrice($value, $format, $includeContainer);
         }
         catch (Exception $e){
             $value = $e->getMessage();
         }
+
         return $value;
     }
 
@@ -98,19 +154,16 @@ class Mage_Core_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Format date using current locale options
+     * Format date using current locale options and time zone.
      *
-     * @param   date|Zend_Date|null $date in GMT timezone
-     * @param   string $format
-     * @param   bool $showTime
+     * @param   date|Zend_Date|null $date
+     * @param   string              $format   See Mage_Core_Model_Locale::FORMAT_TYPE_* constants
+     * @param   bool                $showTime Whether to include time
      * @return  string
      */
-    public function formatDate($date=null, $format='short', $showTime=false)
+    public function formatDate($date = null, $format = Mage_Core_Model_Locale::FORMAT_TYPE_SHORT, $showTime = false)
     {
-        if (Mage_Core_Model_Locale::FORMAT_TYPE_FULL    !==$format &&
-            Mage_Core_Model_Locale::FORMAT_TYPE_LONG    !==$format &&
-            Mage_Core_Model_Locale::FORMAT_TYPE_MEDIUM  !==$format &&
-            Mage_Core_Model_Locale::FORMAT_TYPE_SHORT   !==$format) {
+        if (!in_array($format, $this->_allowedFormats, true)) {
             return $date;
         }
         if (!($date instanceof Zend_Date) && $date && !strtotime($date)) {
@@ -118,15 +171,13 @@ class Mage_Core_Helper_Data extends Mage_Core_Helper_Abstract
         }
         if (is_null($date)) {
             $date = Mage::app()->getLocale()->date(Mage::getSingleton('core/date')->gmtTimestamp(), null, null);
-        }
-        elseif (!$date instanceof Zend_Date) {
-            $date = Mage::app()->getLocale()->date(strtotime($date), null, null, $showTime);
+        } else if (!$date instanceof Zend_Date) {
+            $date = Mage::app()->getLocale()->date(strtotime($date), null, null);
         }
 
         if ($showTime) {
             $format = Mage::app()->getLocale()->getDateTimeFormat($format);
-        }
-        else {
+        } else {
             $format = Mage::app()->getLocale()->getDateFormat($format);
         }
 
@@ -137,33 +188,27 @@ class Mage_Core_Helper_Data extends Mage_Core_Helper_Abstract
      * Format time using current locale options
      *
      * @param   date|Zend_Date|null $time
-     * @param   string $format
-     * @param   bool $showTime
+     * @param   string              $format
+     * @param   bool                $showDate
      * @return  string
      */
-    public function formatTime($time=null, $format='short', $showDate=false)
+    public function formatTime($time = null, $format = Mage_Core_Model_Locale::FORMAT_TYPE_SHORT, $showDate = false)
     {
-        if (Mage_Core_Model_Locale::FORMAT_TYPE_FULL    !==$format &&
-            Mage_Core_Model_Locale::FORMAT_TYPE_LONG    !==$format &&
-            Mage_Core_Model_Locale::FORMAT_TYPE_MEDIUM  !==$format &&
-            Mage_Core_Model_Locale::FORMAT_TYPE_SHORT   !==$format) {
+        if (!in_array($format, $this->_allowedFormats, true)) {
             return $time;
         }
 
         if (is_null($time)) {
             $date = Mage::app()->getLocale()->date(time());
-        }
-        elseif ($time instanceof Zend_Date) {
+        } else if ($time instanceof Zend_Date) {
             $date = $time;
-        }
-        else {
+        } else {
             $date = Mage::app()->getLocale()->date(strtotime($time));
         }
 
         if ($showDate) {
             $format = Mage::app()->getLocale()->getDateTimeFormat($format);
-        }
-        else {
+        } else {
             $format = Mage::app()->getLocale()->getTimeFormat($format);
         }
 
@@ -203,10 +248,10 @@ class Mage_Core_Helper_Data extends Mage_Core_Helper_Abstract
         return $this->getEncryptor()->validateKey($key);
     }
 
-    public function getRandomString($len, $chars=null)
+    public function getRandomString($len, $chars = null)
     {
         if (is_null($chars)) {
-            $chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            $chars = self::CHARS_LOWERS . self::CHARS_UPPERS . self::CHARS_DIGITS;
         }
         mt_srand(10000000*(double)microtime());
         for ($i = 0, $str = '', $lc = strlen($chars)-1; $i < $len; $i++) {
@@ -249,16 +294,33 @@ class Mage_Core_Helper_Data extends Mage_Core_Helper_Abstract
         if (empty($replacements[$german])) {
             $subst = array(
                 // single ISO-8859-1 letters
-                192=>'A', 193=>'A', 194=>'A', 195=>'A', 196=>'A', 197=>'A', 199=>'C', 208=>'D', 200=>'E', 201=>'E', 202=>'E', 203=>'E', 204=>'I', 205=>'I', 206=>'I', 207=>'I', 209=>'N', 210=>'O', 211=>'O', 212=>'O', 213=>'O', 214=>'O', 216=>'O', 138=>'S', 217=>'U', 218=>'U', 219=>'U', 220=>'U', 221=>'Y', 142=>'Z', 224=>'a', 225=>'a', 226=>'a', 227=>'a', 228=>'a', 229=>'a', 231=>'c', 232=>'e', 233=>'e', 234=>'e', 235=>'e', 236=>'i', 237=>'i', 238=>'i', 239=>'i', 241=>'n', 240=>'o', 242=>'o', 243=>'o', 244=>'o', 245=>'o', 246=>'o', 248=>'o', 154=>'s', 249=>'u', 250=>'u', 251=>'u', 252=>'u', 253=>'y', 255=>'y', 158=>'z',
+                192=>'A', 193=>'A', 194=>'A', 195=>'A', 196=>'A', 197=>'A', 199=>'C',
+                208=>'D', 200=>'E', 201=>'E', 202=>'E', 203=>'E', 204=>'I', 205=>'I',
+                206=>'I', 207=>'I', 209=>'N', 210=>'O', 211=>'O', 212=>'O', 213=>'O',
+                214=>'O', 216=>'O', 138=>'S', 217=>'U', 218=>'U', 219=>'U', 220=>'U',
+                221=>'Y', 142=>'Z', 224=>'a', 225=>'a', 226=>'a', 227=>'a', 228=>'a',
+                229=>'a', 231=>'c', 232=>'e', 233=>'e', 234=>'e', 235=>'e', 236=>'i',
+                237=>'i', 238=>'i', 239=>'i', 241=>'n', 240=>'o', 242=>'o', 243=>'o',
+                244=>'o', 245=>'o', 246=>'o', 248=>'o', 154=>'s', 249=>'u', 250=>'u',
+                251=>'u', 252=>'u', 253=>'y', 255=>'y', 158=>'z',
                 // HTML entities
-                258=>'A', 260=>'A', 262=>'C', 268=>'C', 270=>'D', 272=>'D', 280=>'E', 282=>'E', 286=>'G', 304=>'I', 313=>'L', 317=>'L', 321=>'L', 323=>'N', 327=>'N', 336=>'O', 340=>'R', 344=>'R', 346=>'S', 350=>'S', 354=>'T', 356=>'T', 366=>'U', 368=>'U', 377=>'Z', 379=>'Z', 259=>'a', 261=>'a', 263=>'c', 269=>'c', 271=>'d', 273=>'d', 281=>'e', 283=>'e', 287=>'g', 305=>'i', 322=>'l', 314=>'l', 318=>'l', 324=>'n', 328=>'n', 337=>'o', 341=>'r', 345=>'r', 347=>'s', 351=>'s', 357=>'t', 355=>'t', 367=>'u', 369=>'u', 378=>'z', 380=>'z',
+                258=>'A', 260=>'A', 262=>'C', 268=>'C', 270=>'D', 272=>'D', 280=>'E',
+                282=>'E', 286=>'G', 304=>'I', 313=>'L', 317=>'L', 321=>'L', 323=>'N',
+                327=>'N', 336=>'O', 340=>'R', 344=>'R', 346=>'S', 350=>'S', 354=>'T',
+                356=>'T', 366=>'U', 368=>'U', 377=>'Z', 379=>'Z', 259=>'a', 261=>'a',
+                263=>'c', 269=>'c', 271=>'d', 273=>'d', 281=>'e', 283=>'e', 287=>'g',
+                305=>'i', 322=>'l', 314=>'l', 318=>'l', 324=>'n', 328=>'n', 337=>'o',
+                341=>'r', 345=>'r', 347=>'s', 351=>'s', 357=>'t', 355=>'t', 367=>'u',
+                369=>'u', 378=>'z', 380=>'z',
                 // ligatures
                 198=>'Ae', 230=>'ae', 140=>'Oe', 156=>'oe', 223=>'ss',
             );
 
             if ($german) {
                 // umlauts
-                $subst = array_merge($subst, array(196=>'Ae', 228=>'ae', 214=>'Oe', 246=>'oe', 220=>'Ue', 252=>'ue'));
+                $subst = array_merge($subst, array(
+                    196=>'Ae', 228=>'ae', 214=>'Oe', 246=>'oe', 220=>'Ue', 252=>'ue'
+                ));
             }
 
             $replacements[$german] = array();
@@ -283,7 +345,7 @@ class Mage_Core_Helper_Data extends Mage_Core_Helper_Abstract
     {
         $allow = true;
 
-        $allowedIps = Mage::getStoreConfig('dev/restrict/allow_ips', $storeId);
+        $allowedIps = Mage::getStoreConfig(self::XML_PATH_DEV_ALLOW_IPS, $storeId);
         $remoteAddr = Mage::helper('core/http')->getRemoteAddr();
         if (!empty($allowedIps) && !empty($remoteAddr)) {
             $allowedIps = preg_split('#\s*,\s*#', $allowedIps, null, PREG_SPLIT_NO_EMPTY);
@@ -319,7 +381,7 @@ class Mage_Core_Helper_Data extends Mage_Core_Helper_Abstract
     public function getCacheBetaTypes()
     {
         $types = array();
-        $config = Mage::getConfig()->getNode('global/cache/betatypes');
+        $config = Mage::getConfig()->getNode(self::XML_PATH_CACHE_BETA_TYPES);
         if ($config) {
             foreach ($config->children() as $type=>$node) {
                 $types[$type] = (string)$node->label;
@@ -380,6 +442,13 @@ class Mage_Core_Helper_Data extends Mage_Core_Helper_Abstract
 
             $result = true;
         }
+
+        $eventName = sprintf('core_copy_fieldset_%s_%s', $fieldset, $aspect);
+        Mage::dispatchEvent($eventName, array(
+            'target' => $target,
+            'source' => $source,
+            'root'   => $root
+        ));
 
         return $result;
     }
@@ -598,15 +667,18 @@ XML;
      */
     public function uniqHash($prefix = '')
     {
-        return $prefix . md5(uniqid(microtime(), true));
+        return $prefix . md5(uniqid(microtime().mt_rand(), true));
     }
 
     /**
      * Merge specified files into one
      *
-     * By default will not merge, if there is already merged file exists and it was modified after its components
-     * If target file is specified, will attempt to write merged contents into it, otherwise will return merged content
-     * May apply callback to each file contents. Callback gets parameters: (<existing system filename>, <file contents>)
+     * By default will not merge, if there is already merged file exists and it
+     * was modified after its components
+     * If target file is specified, will attempt to write merged contents into it,
+     * otherwise will return merged content
+     * May apply callback to each file contents. Callback gets parameters:
+     * (<existing system filename>, <file contents>)
      * May filter files by specified extension(s)
      * Returns false on error
      *
@@ -617,7 +689,8 @@ XML;
      * @param array|string $extensionsFilter
      * @return bool|string
      */
-    public function mergeFiles(array $srcFiles, $targetFile = false, $mustMerge = false, $beforeMergeCallback = null, $extensionsFilter = array())
+    public function mergeFiles(array $srcFiles, $targetFile = false, $mustMerge = false,
+        $beforeMergeCallback = null, $extensionsFilter = array())
     {
         try {
             // check whether merger is required
@@ -628,7 +701,7 @@ XML;
                 } else {
                     $targetMtime = filemtime($targetFile);
                     foreach ($srcFiles as $file) {
-                        if (filemtime($file) > $targetMtime) {
+                        if (!file_exists($file) || @filemtime($file) > $targetMtime) {
                             $shouldMerge = true;
                             break;
                         }
@@ -689,5 +762,119 @@ XML;
             Mage::logException($e);
         }
         return false;
+    }
+
+    /**
+     * Return default country code
+     *
+     * @param Mage_Core_Model_Store|string|int $store
+     * @return string
+     */
+    public function getDefaultCountry($store = null)
+    {
+        return Mage::getStoreConfig(self::XML_PATH_DEFAULT_COUNTRY, $store);
+    }
+
+    /**
+     * Return list with protected file extensions
+     *
+     * @param Mage_Core_Model_Store|string|int $store
+     * @return array
+     */
+    public function getProtectedFileExtensions($store = null)
+    {
+        return Mage::getStoreConfig(self::XML_PATH_PROTECTED_FILE_EXTENSIONS, $store);
+    }
+
+    /**
+     * Return list with public files valid paths
+     *
+     * @return array
+     */
+    public function getPublicFilesValidPath()
+    {
+        return Mage::getStoreConfig(self::XML_PATH_PUBLIC_FILES_VALID_PATHS);
+    }
+
+    /**
+     * Check LFI protection
+     *
+     * @throws Mage_Core_Exception
+     * @param string $name
+     * @return bool
+     */
+    public function checkLfiProtection($name)
+    {
+        if (preg_match('#\.\.[\\\/]#', $name)) {
+            throw new Mage_Core_Exception($this->__('Requested file may not include parent directory traversal ("../", "..\\" notation)'));
+        }
+        return true;
+    }
+
+    /**
+     * Check whether database compatible mode is used (configs enable it for MySQL by default).
+     *
+     * @return bool
+     */
+    public function useDbCompatibleMode()
+    {
+        $connType = (string) Mage::getConfig()->getNode(self::XML_PATH_CONNECTION_TYPE);
+        $path = 'global/resource/connection/types/' . $connType . '/compatibleMode';
+        $value = (string) Mage::getConfig()->getNode($path);
+        return (bool) $value;
+    }
+
+    /**
+     * Retrieve merchant country code
+     *
+     * @param Mage_Core_Model_Store|string|int|null $store
+     * @return string
+     */
+    public function getMerchantCountryCode($store = null)
+    {
+        return (string) Mage::getStoreConfig(self::XML_PATH_MERCHANT_COUNTRY_CODE, $store);
+    }
+
+    /**
+     * Retrieve merchant VAT number
+     *
+     * @param Mage_Core_Model_Store|string|int|null $store
+     * @return string
+     */
+    public function getMerchantVatNumber($store = null)
+    {
+        return (string) Mage::getStoreConfig(self::XML_PATH_MERCHANT_VAT_NUMBER, $store);
+    }
+
+    /**
+     * Check whether specified country is in EU countries list
+     *
+     * @param string $countryCode
+     * @param null|int $storeId
+     * @return bool
+     */
+    public function isCountryInEU($countryCode, $storeId = null)
+    {
+        $euCountries = explode(',', Mage::getStoreConfig(self::XML_PATH_EU_COUNTRIES_LIST, $storeId));
+        return in_array($countryCode, $euCountries);
+    }
+
+    /**
+     * Returns the floating point remainder (modulo) of the division of the arguments
+     *
+     * @param float|int $dividend
+     * @param float|int $divisor
+     * @return float|int
+     */
+    public function getExactDivision($dividend, $divisor)
+    {
+        $epsilon = $divisor / self::DIVIDE_EPSILON;
+
+        $remainder = fmod($dividend, $divisor);
+        if (abs($remainder - $divisor) < $epsilon || abs($remainder) < $epsilon) {
+            $remainder = 0;
+        }
+
+        return $remainder;
     }
 }

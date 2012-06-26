@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Core
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -34,7 +34,7 @@ class Mage_Core_Model_Session_Abstract_Varien extends Varien_Object
     const VALIDATOR_REMOTE_ADDR_KEY             = 'remote_addr';
 
     /**
-     * Conigure and start session
+     * Configure and start session
      *
      * @param string $sessionName
      * @return Mage_Core_Model_Session_Abstract_Varien
@@ -56,19 +56,27 @@ class Mage_Core_Model_Session_Abstract_Varien extends Varien_Object
                 ini_set('session.save_handler', 'memcache');
                 session_save_path($this->getSessionSavePath());
                 break;
+            case 'memcached':
+                ini_set('session.save_handler', 'memcached');
+                session_save_path($this->getSessionSavePath());
+                break;
             case 'eaccelerator':
                 ini_set('session.save_handler', 'eaccelerator');
                 break;
             default:
-                session_module_name('files');
-                if (is_writable(Mage::getBaseDir('session'))) {
+                session_module_name($this->getSessionSaveMethod());
+                if (is_writable($this->getSessionSavePath())) {
                     session_save_path($this->getSessionSavePath());
                 }
                 break;
         }
         $cookie = $this->getCookie();
         if (Mage::app()->getStore()->isAdmin()) {
+            $sessionMaxLifetime = Mage_Core_Model_Resource_Session::SEESION_MAX_COOKIE_LIFETIME;
             $adminSessionLifetime = (int)Mage::getStoreConfig('admin/security/session_cookie_lifetime');
+            if ($adminSessionLifetime > $sessionMaxLifetime) {
+                $adminSessionLifetime = $sessionMaxLifetime;
+            }
             if ($adminSessionLifetime > 60) {
                 $cookie->setLifetime($adminSessionLifetime);
             }
@@ -113,10 +121,13 @@ class Mage_Core_Model_Session_Abstract_Varien extends Varien_Object
         }
 
         session_start();
+
         /**
-         * Renew cookie expiration time
-         */
-        $cookie->renew(session_name());
+        * Renew cookie expiration time if session id did not change
+        */
+        if ($cookie->get(session_name()) == $this->getSessionId()) {
+            $cookie->renew(session_name());
+        }
         Varien_Profiler::stop(__METHOD__.'/start');
 
         return $this;
@@ -352,18 +363,30 @@ class Mage_Core_Model_Session_Abstract_Varien extends Varien_Object
         $sessionData = $this->_data[self::VALIDATOR_KEY];
         $validatorData = $this->getValidatorData();
 
-        if ($this->useValidateRemoteAddr() && $sessionData[self::VALIDATOR_REMOTE_ADDR_KEY] != $validatorData[self::VALIDATOR_REMOTE_ADDR_KEY]) {
+        if ($this->useValidateRemoteAddr()
+                && $sessionData[self::VALIDATOR_REMOTE_ADDR_KEY] != $validatorData[self::VALIDATOR_REMOTE_ADDR_KEY]) {
             return false;
         }
-        if ($this->useValidateHttpVia() && $sessionData[self::VALIDATOR_HTTP_VIA_KEY] != $validatorData[self::VALIDATOR_HTTP_VIA_KEY]) {
+        if ($this->useValidateHttpVia()
+                && $sessionData[self::VALIDATOR_HTTP_VIA_KEY] != $validatorData[self::VALIDATOR_HTTP_VIA_KEY]) {
             return false;
         }
-        if ($this->useValidateHttpXForwardedFor() && $sessionData[self::VALIDATOR_HTTP_X_FORVARDED_FOR_KEY] != $validatorData[self::VALIDATOR_HTTP_X_FORVARDED_FOR_KEY]) {
+
+        $sessionValidateHttpXForwardedForKey = $sessionData[self::VALIDATOR_HTTP_X_FORVARDED_FOR_KEY];
+        $validatorValidateHttpXForwardedForKey = $validatorData[self::VALIDATOR_HTTP_X_FORVARDED_FOR_KEY];
+        if ($this->useValidateHttpXForwardedFor()
+            && $sessionValidateHttpXForwardedForKey != $validatorValidateHttpXForwardedForKey ) {
             return false;
         }
         if ($this->useValidateHttpUserAgent()
             && $sessionData[self::VALIDATOR_HTTP_USER_AGENT_KEY] != $validatorData[self::VALIDATOR_HTTP_USER_AGENT_KEY]
-            && !in_array($validatorData[self::VALIDATOR_HTTP_USER_AGENT_KEY], $this->getValidateHttpUserAgentSkip())) {
+        ) {
+            $userAgentValidated = $this->getValidateHttpUserAgentSkip();
+            foreach ($userAgentValidated as $agent) {
+                if (preg_match('/' . $agent . '/iu', $validatorData[self::VALIDATOR_HTTP_USER_AGENT_KEY])) {
+                    return true;
+                }
+            }
             return false;
         }
 
@@ -401,5 +424,16 @@ class Mage_Core_Model_Session_Abstract_Varien extends Varien_Object
         }
 
         return $parts;
+    }
+
+    /**
+     * Regenerate session Id
+     *
+     * @return Mage_Core_Model_Session_Abstract_Varien
+     */
+    public function regenerateSessionId()
+    {
+        session_regenerate_id(true);
+        return $this;
     }
 }

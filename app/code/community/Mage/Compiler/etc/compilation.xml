@@ -21,7 +21,7 @@
  *
  * @category    Mage
  * @package     Mage_Compiler
- * @copyright   Copyright (c) 2009 Irubin Consulting Inc. DBA Varien (http://www.varien.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 -->
@@ -76,7 +76,7 @@
             <Mage_Page_Block_Html/>
 
             <Mage_Cms_Model_Page/>
-            <Mage_Cms_Model_Mysql4_Page/>
+            <Mage_Cms_Model_Resource_Page/>
             <Mage_Cms_Model_Block/>
             <Mage_Cms_Helper_Page/>
             <Mage_Cms_Controller_Router/>
@@ -99,16 +99,16 @@
             <Mage_Core_Model_Resource_Type_Abstract/>
             <Mage_Core_Model_Resource_Abstract/>
             <Mage_Core_Model_Resource/>
-            <Mage_Core_Model_Mysql4_Website_Collection/>
-            <Mage_Core_Model_Mysql4_Website/>
-            <Mage_Core_Model_Mysql4_Url_Rewrite/>
-            <Mage_Core_Model_Mysql4_Store_Group_Collection/>
-            <Mage_Core_Model_Mysql4_Store_Group/>
-            <Mage_Core_Model_Mysql4_Store_Collection/>
-            <Mage_Core_Model_Mysql4_Store/>
-            <Mage_Core_Model_Mysql4_Design/>
-            <Mage_Core_Model_Mysql4_Collection_Abstract/>
-            <Mage_Core_Model_Mysql4_Abstract/>
+            <Mage_Core_Model_Resource_Website_Collection/>
+            <Mage_Core_Model_Resource_Website/>
+            <Mage_Core_Model_Resource_Url_Rewrite/>
+            <Mage_Core_Model_Resource_Store_Group_Collection/>
+            <Mage_Core_Model_Resource_Store_Group/>
+            <Mage_Core_Model_Resource_Store_Collection/>
+            <Mage_Core_Model_Resource_Store/>
+            <Mage_Core_Model_Resource_Design/>
+            <Mage_Core_Model_Resource_Db_Collection_Abstract/>
+            <Mage_Core_Model_Resource_Abstract/>
             <Mage_Core_Model_Message_Collection/>
             <Mage_Core_Model_Message/>
             <Mage_Core_Model_Locale/>
@@ -147,6 +147,21 @@
             <Mage_Core_Block_Profiler/>
             <Mage_Core_Block_Messages/>
             <Mage_Core_Block_Abstract/>
+            <Mage_Eav_Model_Config/>
+            <Mage_Eav_Model_Entity/>
+            <Mage_Eav_Model_Entity_Abstract/>
+            <Mage_Eav_Model_Entity_Attribute/>
+            <Mage_Eav_Model_Entity_Attribute_Abstract/>
+            <Mage_Eav_Model_Entity_Attribute_Interface/>
+            <Mage_Eav_Model_Entity_Interface/>
+            <Mage_Eav_Model_Entity_Type/>
+            <Mage_Eav_Model_Resource_Entity_Attribute/>
+            <Mage_Eav_Model_Resource_Entity_Type/>
+            <Mage_Eav_Model_Resource_Entity_Attribute_Collection/>
+            <Mage_Eav_Model_Entity_Attribute_Backend_Default/>
+            <Mage_Eav_Model_Entity_Attribute_Backend_Datetime/>
+            <Mage_Eav_Model_Entity_Attribute_Backend_Time_Created/>
+            <Mage_Eav_Model_Entity_Attribute_Backend_Time_Updated/>
         </default>
 
         <cms>

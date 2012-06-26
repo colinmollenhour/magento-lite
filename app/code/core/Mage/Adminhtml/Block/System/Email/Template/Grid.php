@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -37,6 +37,9 @@ class Mage_Adminhtml_Block_System_Email_Template_Grid extends Mage_Adminhtml_Blo
     protected function _construct()
     {
         $this->setEmptyText(Mage::helper('adminhtml')->__('No Templates Found'));
+        $this->setId('systemEmailTemplateGrid');
+        $this->setUseAjax(true);
+        $this->setSaveParametersInSession(true);
     }
 
     protected function _prepareCollection()

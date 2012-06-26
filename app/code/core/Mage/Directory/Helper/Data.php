@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Directory
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -31,12 +31,61 @@
  */
 class Mage_Directory_Helper_Data extends Mage_Core_Helper_Abstract
 {
+    /**
+     * Config value that lists ISO2 country codes which have optional Zip/Postal pre-configured
+     */
+    const OPTIONAL_ZIP_COUNTRIES_CONFIG_PATH = 'general/country/optional_zip_countries';
+
+    /*
+     * Path to config value, which lists countries, for which state is required.
+     */
+    const XML_PATH_STATES_REQUIRED = 'general/region/state_required';
+
+    /*
+     * Path to config value, which detects whether or not display the state for the country, if it is not required
+     */
+    const XML_PATH_DISPLAY_ALL_STATES = 'general/region/display_all';
+
+    /**
+     * Country collection
+     *
+     * @var Mage_Directory_Model_Resource_Country_Collection
+     */
     protected $_countryCollection;
+
+    /**
+     * Region collection
+     *
+     * @var Mage_Directory_Model_Resource_Region_Collection
+     */
     protected $_regionCollection;
+
+    /**
+     * Json representation of regions data
+     *
+     * @var string
+     */
     protected $_regionJson;
+
+    /**
+     * Currency cache
+     *
+     * @var array
+     */
     protected $_currencyCache = array();
+
+    /**
+     * ISO2 country codes which have optional Zip/Postal pre-configured
+     *
+     * @var array
+     */
     protected $_optionalZipCountries = null;
 
+    /**
+     * Retrieve region collection
+     *
+     * @return Mage_Directory_Model_Resource_Region_Collection
+     */
     public function getRegionCollection()
     {
         if (!$this->_regionCollection) {
@@ -47,6 +96,11 @@ class Mage_Directory_Helper_Data extends Mage_Core_Helper_Abstract
         return $this->_regionCollection;
     }
 
+    /**
+     * Retrieve country collection
+     *
+     * @return Mage_Directory_Model_Resource_Country_Collection
+     */
     public function getCountryCollection()
     {
         if (!$this->_countryCollection) {
@@ -78,14 +132,19 @@ class Mage_Directory_Helper_Data extends Mage_Core_Helper_Abstract
                 $collection = Mage::getModel('directory/region')->getResourceCollection()
                     ->addCountryFilter($countryIds)
                     ->load();
-                $regions = array();
+                $regions = array(
+                    'config' => array(
+                        'show_all_regions' => $this->getShowNonRequiredState(),
+                        'regions_required' => $this->getCountriesWithStatesRequired()
+                    )
+                );
                 foreach ($collection as $region) {
                     if (!$region->getRegionId()) {
                         continue;
                     }
                     $regions[$region->getCountryId()][$region->getRegionId()] = array(
-                        'code'=>$region->getCode(),
-                        'name'=>$region->getName()
+                        'code' => $region->getCode(),
+                        'name' => $this->__($region->getName())
                     );
                 }
                 $json = Mage::helper('core')->jsonEncode($regions);
@@ -101,7 +160,15 @@ class Mage_Directory_Helper_Data extends Mage_Core_Helper_Abstract
         return $this->_regionJson;
     }
 
-    public function currencyConvert($amount, $from, $to=null)
+    /**
+     * Convert currency
+     *
+     * @param float $amount
+     * @param string $from
+     * @param string $to
+     * @return float
+     */
+    public function currencyConvert($amount, $from, $to = null)
     {
         if (empty($this->_currencyCache[$from])) {
             $this->_currencyCache[$from] = Mage::getModel('directory/currency')->load($from);
@@ -117,14 +184,13 @@ class Mage_Directory_Helper_Data extends Mage_Core_Helper_Abstract
      * Return ISO2 country codes, which have optional Zip/Postal pre-configured
      *
      * @param bool $asJson
-     * @return array
+     * @return array|string
      */
     public function getCountriesWithOptionalZip($asJson = false)
     {
         if (null === $this->_optionalZipCountries) {
-            $this->_optionalZipCountries = preg_split('/\,/', Mage::getStoreConfig('general/country/optional_zip_countries'),
-                0, PREG_SPLIT_NO_EMPTY
-            );
+            $this->_optionalZipCountries = preg_split('/\,/',
+                Mage::getStoreConfig(self::OPTIONAL_ZIP_COUNTRIES_CONFIG_PATH), 0, PREG_SPLIT_NO_EMPTY);
         }
         if ($asJson) {
             return Mage::helper('core')->jsonEncode($this->_optionalZipCountries);
@@ -136,10 +202,51 @@ class Mage_Directory_Helper_Data extends Mage_Core_Helper_Abstract
      * Check whether zip code is optional for specified country code
      *
      * @param string $countryCode
+     * @return boolean
      */
     public function isZipCodeOptional($countryCode)
     {
         $this->getCountriesWithOptionalZip();
         return in_array($countryCode, $this->_optionalZipCountries);
+    }
+
+    /**
+     * Returns the list of countries, for which region is required
+     *
+     * @param boolean $asJson
+     * @return array
+     */
+    public function getCountriesWithStatesRequired($asJson = false)
+    {
+        $countryList = explode(',', Mage::getStoreConfig(self::XML_PATH_STATES_REQUIRED));
+        if ($asJson) {
+            return Mage::helper('core')->jsonEncode($countryList);
+        }
+        return $countryList;
+    }
+
+    /**
+     * Return flag, which indicates whether or not non required state should be shown
+     *
+     * @return bool
+     */
+    public function getShowNonRequiredState()
+    {
+        return (boolean)Mage::getStoreConfig(self::XML_PATH_DISPLAY_ALL_STATES);
+    }
+
+    /**
+     * Returns flag, which indicates whether region is required for specified country
+     *
+     * @param string $countryId
+     * @return bool
+     */
+    public function isRegionRequired($countryId)
+    {
+        $countyList = $this->getCountriesWithStatesRequired();
+        if(!is_array($countyList)) {
+            return false;
+        }
+        return in_array($countryId, $countyList);
     }
 }

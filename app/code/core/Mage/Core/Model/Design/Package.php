@@ -20,7 +20,7 @@
  *
  * @category    Mage
  * @package     Mage_Core
- * @copyright   Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -186,13 +186,13 @@ class Mage_Core_Model_Design_Package
             $oldValues['store'] = $this->getStore();
             $this->setStore($storePackageArea['store']);
         }
-        if (array_key_exists('package', $storePackageArea)) {
-            $oldValues['package'] = $this->getPackageName();
-            $this->setPackageName($storePackageArea['package']);
-        }
         if (array_key_exists('area', $storePackageArea)) {
             $oldValues['area'] = $this->getArea();
             $this->setArea($storePackageArea['area']);
+        }
+        if (array_key_exists('package', $storePackageArea)) {
+            $oldValues['package'] = $this->getPackageName();
+            $this->setPackageName($storePackageArea['package']);
         }
         return $oldValues;
     }
@@ -518,7 +518,7 @@ class Mage_Core_Model_Design_Package
      * Directories lister utility method
      *
      * @param string $path
-     * @param string|false $fullPath
+     * @param string|bool $fullPath
      * @return array
      */
     private function _listDirectories($path, $fullPath = false)
@@ -553,32 +553,53 @@ class Mage_Core_Model_Design_Package
      */
     protected function _checkUserAgentAgainstRegexps($regexpsConfigPath)
     {
-        if (!empty($_SERVER['HTTP_USER_AGENT'])) {
-            if (!empty(self::$_customThemeTypeCache[$regexpsConfigPath])) {
-                return self::$_customThemeTypeCache[$regexpsConfigPath];
+        if (empty($_SERVER['HTTP_USER_AGENT'])) {
+            return false;
+        }
+
+        if (!empty(self::$_customThemeTypeCache[$regexpsConfigPath])) {
+            return self::$_customThemeTypeCache[$regexpsConfigPath];
+        }
+
+        $configValueSerialized = Mage::getStoreConfig($regexpsConfigPath, $this->getStore());
+
+        if (!$configValueSerialized) {
+            return false;
+        }
+
+        $regexps = @unserialize($configValueSerialized);
+
+        if (empty($regexps)) {
+            return false;
+        }
+
+        return self::getPackageByUserAgent($regexps, $regexpsConfigPath);
+    }
+
+    /**
+     * Return package name based on design exception rules
+     *
+     * @param array $rules - design exception rules
+     * @param string $regexpsConfigPath
+     * @return bool|string
+     */
+    public static function getPackageByUserAgent(array $rules, $regexpsConfigPath = 'path_mock')
+    {
+        foreach ($rules as $rule) {
+            if (!empty(self::$_regexMatchCache[$rule['regexp']][$_SERVER['HTTP_USER_AGENT']])) {
+                self::$_customThemeTypeCache[$regexpsConfigPath] = $rule['value'];
+                return $rule['value'];
             }
-            $configValueSerialized = Mage::getStoreConfig($regexpsConfigPath, $this->getStore());
-            if ($configValueSerialized) {
-                $regexps = @unserialize($configValueSerialized);
-                if (!empty($regexps)) {
-                    foreach ($regexps as $rule) {
-                        if (!empty(self::$_regexMatchCache[$rule['regexp']][$_SERVER['HTTP_USER_AGENT']])) {
-                            self::$_customThemeTypeCache[$regexpsConfigPath] = $rule['value'];
-                            return $rule['value'];
-                        }
-                        $regexp = $rule['regexp'];
-                        if (false === strpos($regexp, '/', 0)) {
-                            $regexp = '/' . $regexp . '/';
-                        }
-                        if (@preg_match($regexp, $_SERVER['HTTP_USER_AGENT'])) {
-                            self::$_regexMatchCache[$rule['regexp']][$_SERVER['HTTP_USER_AGENT']] = true;
-                            self::$_customThemeTypeCache[$regexpsConfigPath] = $rule['value'];
-                            return $rule['value'];
-                        }
-                    }
-                }
+
+            $regexp = '/' . trim($rule['regexp'], '/') . '/';
+
+            if (@preg_match($regexp, $_SERVER['HTTP_USER_AGENT'])) {
+                self::$_regexMatchCache[$rule['regexp']][$_SERVER['HTTP_USER_AGENT']] = true;
+                self::$_customThemeTypeCache[$regexpsConfigPath] = $rule['value'];
+                return $rule['value'];
             }
         }
+
         return false;
     }
 
@@ -595,8 +616,8 @@ class Mage_Core_Model_Design_Package
         if (!$targetDir) {
             return '';
         }
-        if (Mage::helper('core')->mergeFiles($files, $targetDir . DS . $targetFilename, false, null, 'js')) {
-            return Mage::getBaseUrl('media') . 'js/' . $targetFilename;
+        if ($this->_mergeFiles($files, $targetDir . DS . $targetFilename, false, null, 'js')) {
+            return Mage::getBaseUrl('media', Mage::app()->getRequest()->isSecure()) . 'js/' . $targetFilename;
         }
         return '';
     }
@@ -607,18 +628,83 @@ class Mage_Core_Model_Design_Package
      * @param $files
      * @return string
      */
-     public function getMergedCssUrl($files)
-     {
-        $targetFilename = md5(implode(',', $files)) . '.css';
-        $targetDir = $this->_initMergerDir('css');
+    public function getMergedCssUrl($files)
+    {
+        // secure or unsecure
+        $isSecure = Mage::app()->getRequest()->isSecure();
+        $mergerDir = $isSecure ? 'css_secure' : 'css';
+        $targetDir = $this->_initMergerDir($mergerDir);
         if (!$targetDir) {
             return '';
         }
-        if (Mage::helper('core')->mergeFiles($files, $targetDir . DS . $targetFilename, false, array($this, 'beforeMergeCss'), 'css')) {
-            return Mage::getBaseUrl('media') . 'css/' . $targetFilename;
+
+        // base hostname & port
+        $baseMediaUrl = Mage::getBaseUrl('media', $isSecure);
+        $hostname = parse_url($baseMediaUrl, PHP_URL_HOST);
+        $port = parse_url($baseMediaUrl, PHP_URL_PORT);
+        if (false === $port) {
+            $port = $isSecure ? 443 : 80;
+        }
+
+        // merge into target file
+        $targetFilename = md5(implode(',', $files) . "|{$hostname}|{$port}") . '.css';
+        $mergeFilesResult = $this->_mergeFiles(
+            $files, $targetDir . DS . $targetFilename,
+            false,
+            array($this, 'beforeMergeCss'),
+            'css'
+        );
+        if ($mergeFilesResult) {
+            return $baseMediaUrl . $mergerDir . '/' . $targetFilename;
         }
         return '';
-     }
+    }
+
+    /**
+     * Merges files into one and saves it into DB (if DB file storage is on)
+     *
+     * @see Mage_Core_Helper_Data::mergeFiles()
+     * @param array $srcFiles
+     * @param string|bool $targetFile - file path to be written
+     * @param bool $mustMerge
+     * @param callback $beforeMergeCallback
+     * @param array|string $extensionsFilter
+     * @return bool|string
+     */
+    protected function _mergeFiles(array $srcFiles, $targetFile = false,
+        $mustMerge = false, $beforeMergeCallback = null, $extensionsFilter = array())
+    {
+        if (Mage::helper('core/file_storage_database')->checkDbUsage()) {
+            if (!file_exists($targetFile)) {
+                Mage::helper('core/file_storage_database')->saveFileToFilesystem($targetFile);
+            }
+            if (file_exists($targetFile)) {
+                $filemtime = filemtime($targetFile);
+            } else {
+                $filemtime = null;
+            }
+            $result = Mage::helper('core')->mergeFiles(
+                $srcFiles,
+                $targetFile,
+                $mustMerge,
+                $beforeMergeCallback,
+                $extensionsFilter
+            );
+            if ($result && (filemtime($targetFile) > $filemtime)) {
+                Mage::helper('core/file_storage_database')->saveFile($targetFile);
+            }
+            return $result;
+
+        } else {
+            return Mage::helper('core')->mergeFiles(
+                $srcFiles,
+                $targetFile,
+                $mustMerge,
+                $beforeMergeCallback,
+                $extensionsFilter
+            );
+        }
+    }
 
     /**
      * Remove all merged js/css files
@@ -628,7 +714,8 @@ class Mage_Core_Model_Design_Package
     public function cleanMergedJsCss()
     {
         $result = (bool)$this->_initMergerDir('js', true);
-        return (bool)$this->_initMergerDir('css', true) && $result;
+        $result = (bool)$this->_initMergerDir('css', true) && $result;
+        return (bool)$this->_initMergerDir('css_secure', true) && $result;
     }
 
     /**
@@ -637,6 +724,7 @@ class Mage_Core_Model_Design_Package
      *
      * @param string $dirRelativeName
      * @param bool $cleanup
+     * @return bool
      */
     protected function _initMergerDir($dirRelativeName, $cleanup = false)
     {
@@ -645,6 +733,7 @@ class Mage_Core_Model_Design_Package
             $dir = Mage::getBaseDir('media') . DS . $dirRelativeName;
             if ($cleanup) {
                 Varien_Io_File::rmdirRecursive($dir);
+                Mage::helper('core/file_storage_database')->deleteFolder($dir);
             }
             if (!is_dir($dir)) {
                 mkdir($dir);
@@ -670,7 +759,7 @@ class Mage_Core_Model_Design_Package
        $cssImport = '/@import\\s+([\'"])(.*?)[\'"]/';
        $contents = preg_replace_callback($cssImport, array($this, '_cssMergerImportCallback'), $contents);
 
-       $cssUrl = '/url\\(\\s*([^\\)\\s]+)\\s*\\)?/';
+       $cssUrl = '/url\\(\\s*(?!data:)([^\\)\\s]+)\\s*\\)?/';
        $contents = preg_replace_callback($cssUrl, array($this, '_cssMergerUrlCallback'), $contents);
 
        return $contents;
@@ -725,18 +814,31 @@ class Mage_Core_Model_Design_Package
     protected function _prepareUrl($uri)
     {
         // check absolute or relative url
-        if (!preg_match('/^[http|https]/i', $uri) && !preg_match('/^\//i', $uri)) {
-
+        if (!preg_match('/^https?:/i', $uri) && !preg_match('/^\//i', $uri)) {
             $fileDir = '';
             $pathParts = explode(DS, $uri);
             $fileDirParts = explode(DS, $this->_callbackFileDir);
-            $baseUrl = Mage::getBaseUrl('web');
+            $store = $this->getStore();
+            if ($store->isAdmin()) {
+                $secure = $store->isAdminUrlSecure();
+            } else {
+                $secure = $store->isFrontUrlSecure() && Mage::app()->getRequest()->isSecure();
+            }
+
+            if ('skin' == $fileDirParts[0]) {
+                $baseUrl = Mage::getBaseUrl('skin', $secure);
+                $fileDirParts = array_slice($fileDirParts, 1);
+            } elseif ('media' == $fileDirParts[0]) {
+                $baseUrl = Mage::getBaseUrl('media', $secure);
+                $fileDirParts = array_slice($fileDirParts, 1);
+            } else {
+                $baseUrl = Mage::getBaseUrl('web', $secure);
+            }
 
             foreach ($pathParts as $key=>$part) {
                 if ($part == '.' || $part == '..') {
                     unset($pathParts[$key]);
                 }
-
                 if ($part == '..' && count($fileDirParts)) {
                     $fileDirParts = array_slice($fileDirParts, 0, count($fileDirParts) - 1);
                 }
