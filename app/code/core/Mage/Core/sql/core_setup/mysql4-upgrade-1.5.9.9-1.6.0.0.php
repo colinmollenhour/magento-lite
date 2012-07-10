@@ -1391,6 +1391,7 @@ $installer->getConnection()->addForeignKey(
     'store_id'
 );
 
+/*
 $installer->getConnection()->addForeignKey(
     $installer->getFkName('core/url_rewrite', 'product_id', 'catalog/product', 'entity_id'),
     $installer->getTable('core/url_rewrite'),
@@ -1405,7 +1406,7 @@ $installer->getConnection()->addForeignKey(
     'category_id',
     $installer->getTable('catalog/category'),
     'entity_id'
-);
+);*/
 
 $installer->getConnection()->addForeignKey(
     $installer->getFkName('core/url_rewrite', 'store_id', 'core/store', 'store_id'),
