@@ -60,8 +60,11 @@ on removed modules.
 
 h2. Installation
 
-# Clone this repository to a directory within your webroot.
+# Clone this repository to a directory within your web root.
 # The Zend Framework is included as a git submodule so it must be initialized:
-## @$ git submodule init@
-## @$ git submodule update@
+## @$ git submodule update --init@
+# Copy .htaccess.sample to .htaccess and modify as necessary:
+## @$ cp .htaccess.sample .htaccess@
+# Make var, media and app/etc directories writable:
+## @$ chmod -R go+rwX var media app/etc@
 # Visit the web root in your browser to start installation.

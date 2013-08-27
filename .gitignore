@@ -9,3 +9,4 @@ skin/frontend/*
 !skin/frontend/base
 !skin/frontend/default
 .modman
+.htaccess
