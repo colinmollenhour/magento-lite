@@ -2,3 +2,10 @@ var/*
 media/*
 app/etc/local.xml
 app/etc/modules/*.xml
+app/design/frontend/*
+!app/design/frontend/base
+!app/design/frontend/default
+skin/frontend/*
+!skin/frontend/base
+!skin/frontend/default
+.modman
