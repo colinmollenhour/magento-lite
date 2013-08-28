@@ -1,4 +1,4 @@
-  #!/bin/sh
+#!/bin/sh
 
 # REPLACE with your PHP5 binary path (example: /usr/local/php5/bin/php )
 #MAGE_PHP_BIN="php"

@@ -31,13 +31,6 @@
             <active>false</active>
             <codePool>core</codePool>
         </Mage_AdminNotification>
-        <Mage_Api>
-            <active>false</active>
-            <codePool>core</codePool>
-            <depends>
-                <Mage_Core />
-            </depends>
-        </Mage_Api>
         <Mage_Eav>
             <active>false</active>
             <codePool>core</codePool>

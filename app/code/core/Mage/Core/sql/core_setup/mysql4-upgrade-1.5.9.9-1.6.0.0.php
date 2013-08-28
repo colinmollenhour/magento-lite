@@ -726,7 +726,7 @@ $tables = array(
                 'type'      => Varien_Db_Ddl_Table::TYPE_TEXT,
                 'length'    => 255,
                 'nullable'  => false,
-                'default'   => 'Translate String',
+                'default'   => Mage_Core_Model_Translate::DEFAULT_STRING,
                 'comment'   => 'Translation String'
             ),
             'store_id' => array(
@@ -1391,7 +1391,6 @@ $installer->getConnection()->addForeignKey(
     'store_id'
 );
 
-/*
 $installer->getConnection()->addForeignKey(
     $installer->getFkName('core/url_rewrite', 'product_id', 'catalog/product', 'entity_id'),
     $installer->getTable('core/url_rewrite'),
@@ -1406,7 +1405,7 @@ $installer->getConnection()->addForeignKey(
     'category_id',
     $installer->getTable('catalog/category'),
     'entity_id'
-);*/
+);
 
 $installer->getConnection()->addForeignKey(
     $installer->getFkName('core/url_rewrite', 'store_id', 'core/store', 'store_id'),

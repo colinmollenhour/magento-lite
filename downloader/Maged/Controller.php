@@ -991,11 +991,11 @@ final class Maged_Controller
     {
         return array(
             'major'     => '1',
-            'minor'     => '7',
+            'minor'     => '8',
             'revision'  => '0',
-            'patch'     => '1',
-            'stability' => '',
-            'number'    => '',
+            'patch'     => '0',
+            'stability' => 'alpha',
+            'number'    => '1',
         );
     }
 
