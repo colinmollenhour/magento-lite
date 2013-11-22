@@ -20,27 +20,19 @@
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-class Mage_Adminhtml_Model_System_Config_Source_Price_Step
+/**
+ * Locale weekdays source
+ *
+ * @author      Magento Core Team <core@magentocommerce.com>
+ */
+class Mage_Adminhtml_Model_System_Config_Source_Locale_Weekdaycodes
 {
     public function toOptionArray()
     {
-        return array(
-            array(
-                'value' => Mage_Catalog_Model_Layer_Filter_Price::RANGE_CALCULATION_AUTO,
-                'label' => Mage::helper('adminhtml')->__('Automatic (equalize price ranges)')
-            ),
-            array(
-                'value' => Mage_Catalog_Model_Layer_Filter_Price::RANGE_CALCULATION_IMPROVED,
-                'label' => Mage::helper('adminhtml')->__('Automatic (equalize product counts)')
-            ),
-            array(
-                'value' => Mage_Catalog_Model_Layer_Filter_Price::RANGE_CALCULATION_MANUAL,
-                'label' => Mage::helper('adminhtml')->__('Manual')
-            ),
-        );
+        return Mage::app()->getLocale()->getOptionWeekdays(true, true);
     }
 }
