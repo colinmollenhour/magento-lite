@@ -19,19 +19,40 @@
  * needs please refer to http://www.magentocommerce.com for more information.
  *
  * @category    Mage
- * @package     Mage_Adminhtml
- * @copyright   Copyright (c) 2012 Magento Inc. (http://www.magentocommerce.com)
+ * @package     Mage_Core
+ * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-
-class Mage_Adminhtml_Model_System_Config_Source_Price_Scope
+/**
+ * Logger model
+ *
+ * @author Magento Core Team <core@magentocommerce.com>
+ */
+class Mage_Core_Model_Logger
 {
-    public function toOptionArray()
+    /**
+     * Log wrapper
+     *
+     * @param string $message
+     * @param int $level
+     * @param string $file
+     * @param bool $forceLog
+     * @return void
+     */
+    public function log($message, $level = null, $file = '', $forceLog = false)
     {
-        return array(
-            array('value'=>'0', 'label'=>Mage::helper('core')->__('Global')),
-            array('value'=>'1', 'label'=>Mage::helper('core')->__('Website')),
-        );
+        Mage::log($message, $level, $file, $forceLog);
+    }
+
+    /**
+     * Log exception wrapper
+     *
+     * @param Exception $e
+     * @return void
+     */
+    public function logException(Exception $e)
+    {
+        Mage::logException($e);
     }
 }
