@@ -228,7 +228,7 @@ class Mage_Page_Block_Html_Topmenu extends Mage_Core_Block_Template
             Mage::app()->getStore()->getId(),
             Mage::getDesign()->getPackageName(),
             Mage::getDesign()->getTheme('template'),
-            0,//Mage::getSingleton('customer/session')->getCustomerGroupId(),
+            Mage::getSingleton('customer/session')->getCustomerGroupId(),
             'template' => $this->getTemplate(),
             'name' => $this->getNameInLayout(),
             $this->getCurrentEntityKey()
