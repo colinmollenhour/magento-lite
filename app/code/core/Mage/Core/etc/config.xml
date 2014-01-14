@@ -265,7 +265,7 @@
                 </invalid_caches>
             </translate_inline>
             <log>
-                <active>0</active>
+                <active>1</active>
                 <file>system.log</file>
                 <exception_file>exception.log</exception_file>
             </log>
