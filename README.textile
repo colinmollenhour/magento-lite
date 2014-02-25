@@ -4,7 +4,7 @@ h2. Overview
 
 This project is based on Magento Community Edition (www.magentocommerce.com), but is otherwise not
 affiliated with, sponsored by, endorsed by or supported by the creators and owners of Magento
-(Magento Inc. and Irubin Consulting Inc. DBA Varien)
+(Magento Inc.).
 
 This repository contains a stripped-down version of Magento to allow it to be used as a more general
 purpose framework or CMS. Therefore, all functionality relating to shopping carts has been removed.
@@ -22,7 +22,7 @@ be usable and modules built on this repository could be used with Magento.
 
 h2. Current Status
 
-* Current upstream version: Magento Community Edition 1.8.0.0
+* Current upstream version: Magento Community Edition 1.8.1.0
 * Overall state: functional though not thoroughly tested
 * Installation completes successfully.
 * The home page renders (default theme sans the content) and CMS works.
@@ -50,10 +50,9 @@ h2. Current Status
 ** Compiler
 ** Widget
 * A new module Mage_Lite was added to handle any changes that must be made that can't easily be handled by copy/modify.
-* The concept of Websites and Stores remains unchanged, but you can think of a "Store" as something else or
-simply ignore it with no adverse effects.
+* The concept of Websites and Stores remains unchanged, but you can think of a "Store" as something else or simply ignore it with no adverse effects.
 
-*Kudos to Varien* for creating such a great framework and keeping it only loosely coupled with the application it
+*Kudos to Magento* for creating such a great framework and keeping it only loosely coupled with the application it
 is bundled with and designed for! So far no source code within core directories has been modified. Only a few
 files were overridden and copied/modified under app/code/community/Mage to fix issues due to dependencies
 on removed modules.
