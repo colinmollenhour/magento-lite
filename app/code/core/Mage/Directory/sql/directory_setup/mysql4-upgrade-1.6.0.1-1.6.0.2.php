@@ -19,22 +19,41 @@
  * needs please refer to http://www.magentocommerce.com for more information.
  *
  * @category    Mage
- * @package     Mage_Core
+ * @package     Mage_Directory
  * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-$installer = $this;
 /* @var $installer Mage_Core_Model_Resource_Setup */
-
+$installer = $this;
 $installer->startSetup();
 
-$rows = $installer->_conn->fetchAll("select * from {$this->getTable('core_config_data')} where path in ('paypal/wpp/api_password', 'paypal/wpp/api_signature', 'paypal/wpp/api_username', 'paypal/wps/business_account', 'paypal/wpuk/user', 'paypal/wpuk/pwd', 'carriers/dhl/id', 'carriers/dhl/password', 'carriers/dhl/shipping_key', 'carriers/dhl/shipping_intlkey', 'carriers/fedex/account', 'carriers/ups/account_license_number', 'carriers/ups/username', 'carriers/usps/userid', 'payment/authorizenet/login', 'payment/authorizenet/trans_key', 'payment/verisign/pwd', 'payment/verisign/user')");
+/* @var $connection Varien_Db_Adapter_Pdo_Mysql */
+$connection  = $installer->getConnection();
 
-$hlp = Mage::helper('core');
-foreach ($rows as $r) {
-    if (!empty($r['value'])) {
-        $r['value'] = $hlp->encrypt($r['value']);
-        $installer->_conn->update($this->getTable('core_config_data'), $r, 'config_id='.$r['config_id']);
-    }
-}
+$regionTable = $installer->getTable('directory/country_region');
+
+/* Armed Forces changes based on USPS */
+
+/* Armed Forces Middle East (AM) is now served by Armed Forces Europe (AE) */
+$bind = array('code' => 'AE');
+$where = array('code = ?' => 'AM');
+
+$connection->update($regionTable, $bind, $where);
+
+/* Armed Forces Canada (AC) is now served by Armed Forces Europe (AE) */
+$bind = array('code' => 'AE');
+$where = array('code = ?' => 'AC');
+
+$connection->update($regionTable, $bind, $where);
+
+
+/* Armed Forces Africa (AF) is now served by Armed Forces Europe (AE) */
+$bind = array('code' => 'AE');
+$where = array('code = ?' => 'AF');
+
+$connection->update($regionTable, $bind, $where);
+
+
+
+$installer->endSetup();

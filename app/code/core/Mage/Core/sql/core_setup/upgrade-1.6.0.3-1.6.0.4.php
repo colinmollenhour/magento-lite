@@ -19,30 +19,22 @@
  * needs please refer to http://www.magentocommerce.com for more information.
  *
  * @category    Mage
- * @package     Mage_Adminhtml
+ * @package     Mage_Core
  * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-/**
- * Store render store
- *
- * @category   Mage
- * @package    Mage_Adminhtml
- * @author      Magento Core Team <core@magentocommerce.com>
- * @deprecated after 1.13.1.0 use Mage_Adminhtml_Block_System_Store_Tree
- */
+/* @var $installer Mage_Core_Model_Resource_Setup */
+$installer = $this;
 
-class Mage_Adminhtml_Block_System_Store_Grid_Render_Store
-    extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract
-{
-    public function render(Varien_Object $row)
-    {
-        if (!$row->getData($this->getColumn()->getIndex())) {
-            return null;
-        }
-        return '<a title="' . Mage::helper('core')->__('Edit Store View') . '"
-            href="' . $this->getUrl('*/*/editStore', array('store_id' => $row->getStoreId())) . '">'
-            . $this->escapeHtml($row->getData($this->getColumn()->getIndex())) . '</a>';
-    }
-}
+$installer->startSetup();
+$connection = $installer->getConnection();
+
+$connection->delete(
+    $this->getTable('core_config_data'),
+    $connection->prepareSqlCondition('path', array(
+        'like' => 'google/checkout%'
+    ))
+);
+
+$installer->endSetup();

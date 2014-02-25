@@ -19,30 +19,38 @@
  * needs please refer to http://www.magentocommerce.com for more information.
  *
  * @category    Mage
- * @package     Mage_Adminhtml
+ * @package     Mage_Page
  * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
- * Store render store
+ * Html notices block
  *
- * @category   Mage
- * @package    Mage_Adminhtml
+ * @category    Mage
+ * @package     Mage_Page
  * @author      Magento Core Team <core@magentocommerce.com>
- * @deprecated after 1.13.1.0 use Mage_Adminhtml_Block_System_Store_Tree
  */
-
-class Mage_Adminhtml_Block_System_Store_Grid_Render_Store
-    extends Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Abstract
+class Mage_Page_Block_Html_CookieNotice extends Mage_Core_Block_Template
 {
-    public function render(Varien_Object $row)
+    /**
+     * Get content for cookie restriction block
+     *
+     * @return string
+     */
+    public function getCookieRestrictionBlockContent()
     {
-        if (!$row->getData($this->getColumn()->getIndex())) {
-            return null;
+        $blockIdentifier = Mage::helper('core/cookie')->getCookieRestrictionNoticeCmsBlockIdentifier();
+        $block = Mage::getModel('cms/block')->load($blockIdentifier, 'identifier');
+
+        $html = '';
+        if ($block->getIsActive()) {
+            /* @var $helper Mage_Cms_Helper_Data */
+            $helper = Mage::helper('cms');
+            $processor = $helper->getBlockTemplateProcessor();
+            $html = $processor->filter($block->getContent());
         }
-        return '<a title="' . Mage::helper('core')->__('Edit Store View') . '"
-            href="' . $this->getUrl('*/*/editStore', array('store_id' => $row->getStoreId())) . '">'
-            . $this->escapeHtml($row->getData($this->getColumn()->getIndex())) . '</a>';
+
+        return $html;
     }
 }
