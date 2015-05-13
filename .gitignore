@@ -10,3 +10,7 @@ skin/frontend/*
 !skin/frontend/default
 .modman
 .htaccess
+
+.git/*
+.idea/*
+.modman/*
