@@ -10,18 +10,18 @@
  * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to license@magentocommerce.com so we can send you a copy immediately.
+ * to license@magento.com so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade Magento to newer
  * versions in the future. If you wish to customize Magento for your
- * needs please refer to http://www.magentocommerce.com for more information.
+ * needs please refer to http://www.magento.com for more information.
  *
  * @category    Mage
  * @package     Mage_Cron
- * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
@@ -350,16 +350,11 @@ class Mage_Cron_Model_Observer
         if ($schedule->getId() === null) {
             $ts = strftime('%Y-%m-%d %H:%M:00', time());
             $schedule->setJobCode($jobCode)
-                ->setStatus(Mage_Cron_Model_Schedule::STATUS_RUNNING)
                 ->setCreatedAt($ts)
-                ->setScheduledAt($ts)
-                ->save();
-            return $schedule;
-        } else if ($schedule->getStatus() != Mage_Cron_Model_Schedule::STATUS_RUNNING) {
-            $schedule->tryLockJob($schedule->getStatus());
-            return $schedule;
+                ->setScheduledAt($ts);
         }
+        $schedule->setStatus(Mage_Cron_Model_Schedule::STATUS_RUNNING)->save();
+        return $schedule;
 
-        return false;
     }
 }
