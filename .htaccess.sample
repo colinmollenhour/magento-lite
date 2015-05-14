@@ -1,4 +1,16 @@
 ############################################
+## These options are useful for development
+#php_flag display_startup_errors on
+#php_flag display_errors on
+#php_flag html_errors on
+#php_flag log_errors on
+#php_flag log_errors_max_len 0
+#php_value error_log /var/www/magento-lite/var/log/php_errors.log
+
+############################################
+
+
+############################################
 ## uncomment these lines for CGI mode
 ## make sure to specify the correct cgi php binary file name
 ## it might be /cgi-bin/php-cgi
