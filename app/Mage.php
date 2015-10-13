@@ -169,7 +169,7 @@ final class Mage
     {
         return array(
             'major'     => '1',
-            'minor'     => '8',
+            'minor'     => '9',
             'revision'  => '1',
             'patch'     => '0',
             'stability' => '',

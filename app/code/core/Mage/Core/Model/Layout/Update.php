@@ -10,18 +10,18 @@
  * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to license@magentocommerce.com so we can send you a copy immediately.
+ * to license@magento.com so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade Magento to newer
  * versions in the future. If you wish to customize Magento for your
- * needs please refer to http://www.magentocommerce.com for more information.
+ * needs please refer to http://www.magento.com for more information.
  *
  * @category    Mage
  * @package     Mage_Core
- * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 
@@ -417,14 +417,20 @@ class Mage_Core_Model_Layout_Update
         $elementClass = $this->getElementClass();
         $updatesRoot = Mage::app()->getConfig()->getNode($area.'/layout/updates');
         Mage::dispatchEvent('core_layout_update_updates_get_after', array('updates' => $updatesRoot));
+        $updates = $updatesRoot->asArray();
+        $themeUpdates = Mage::getSingleton('core/design_config')->getNode("$area/$package/$theme/layout/updates");
+        if ($themeUpdates && is_array($themeUpdates->asArray())) {
+            //array_values() to ensure that theme-specific layouts don't override, but add to module layouts
+            $updates = array_merge($updates, array_values($themeUpdates->asArray()));
+        }
         $updateFiles = array();
-        foreach ($updatesRoot->children() as $updateNode) {
-            if ($updateNode->file) {
-                $module = $updateNode->getAttribute('module');
+        foreach ($updates as $updateNode) {
+            if (!empty($updateNode['file'])) {
+                $module = isset($updateNode['@']['module']) ? $updateNode['@']['module'] : false;
                 if ($module && Mage::getStoreConfigFlag('advanced/modules_disable_output/' . $module, $storeId)) {
                     continue;
                 }
-                $updateFiles[] = (string)$updateNode->file;
+                $updateFiles[] = $updateNode['file'];
             }
         }
         // custom local layout updates file - load always last
