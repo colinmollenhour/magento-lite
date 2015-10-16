@@ -35,29 +35,36 @@
             <active>false</active>
             <codePool>core</codePool>
             <depends>
-                <Mage_Core />
+                <Mage_Core/>
             </depends>
         </Mage_Api>
+        <Mage_Api2>
+            <active>false</active>
+            <codePool>core</codePool>
+            <depends>
+                <Mage_Core/>
+            </depends>
+        </Mage_Api2>
         <Mage_Eav>
             <active>false</active>
             <codePool>core</codePool>
             <depends>
-                <Mage_Core />
+                <Mage_Core/>
             </depends>
         </Mage_Eav>
         <Mage_Backup>
             <active>false</active>
             <codePool>core</codePool>
             <depends>
-                <Mage_Core />
+                <Mage_Core/>
             </depends>
         </Mage_Backup>
         <Mage_Media>
             <active>false</active>
             <codePool>core</codePool>
             <depends>
-                <Mage_Core />
-             </depends>
+                <Mage_Core/>
+            </depends>
         </Mage_Media>
         <Mage_Index>
             <active>false</active>
