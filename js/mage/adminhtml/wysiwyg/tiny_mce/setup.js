@@ -95,6 +95,7 @@ tinyMceWysiwygSetup.prototype =
         }
 
         var settings = {
+            schema : 'html5',
             mode : (mode != undefined ? mode : 'none'),
             elements : this.id,
             theme : 'advanced',

@@ -41,6 +41,7 @@
                     <initStatements>SET NAMES utf8</initStatements>
                     <type>pdo_mysql</type>
                     <active>0</active>
+                    <persistent>0</persistent>
                 </connection>
             </default_setup>
             <default_write>

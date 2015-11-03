@@ -20,8 +20,8 @@
  *
  * @category    Mage
  * @package     Mage_Core
- * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 class Mage_Core_Controller_Varien_Router_Standard extends Mage_Core_Controller_Varien_Router_Abstract
@@ -43,7 +43,7 @@ class Mage_Core_Controller_Varien_Router_Standard extends Mage_Core_Controller_V
                 $modules = array((string)$routerConfig->args->module);
                 if ($routerConfig->args->modules) {
                     foreach ($routerConfig->args->modules->children() as $customModule) {
-                        if ($customModule) {
+                        if ((string)$customModule) {
                             if ($before = $customModule->getAttribute('before')) {
                                 $position = array_search($before, $modules);
                                 if ($position === false) {

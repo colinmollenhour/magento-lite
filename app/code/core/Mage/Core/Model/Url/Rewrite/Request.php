@@ -20,8 +20,8 @@
  *
  * @category    Mage
  * @package     Mage_Core
- * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
@@ -140,7 +140,7 @@ class Mage_Core_Model_Url_Rewrite_Request
 
         $fromStore = $this->_request->getQuery('___from_store');
         if (!$this->_rewrite->getId() && $fromStore) {
-            $stores = $this->_app->getStores();
+            $stores = $this->_app->getStores(false, true);
             if (!empty($stores[$fromStore])) {
                 /** @var $store Mage_Core_Model_Store */
                 $store = $stores[$fromStore];
@@ -160,7 +160,7 @@ class Mage_Core_Model_Url_Rewrite_Request
 
             $this->_setStoreCodeCookie($currentStore->getCode());
 
-            $targetUrl = $this->_request->getBaseUrl() . '/' . $this->_rewrite->getRequestPath();
+            $targetUrl = $currentStore->getBaseUrl() . $this->_rewrite->getRequestPath();
             $this->_sendRedirectHeaders($targetUrl, true);
         }
 

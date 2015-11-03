@@ -20,8 +20,8 @@
  *
  * @category    Mage
  * @package     Mage_Core
- * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 
@@ -64,6 +64,11 @@ class Mage_Core_Model_Email_Template_Filter extends Varien_Filter_Template
     protected $_storeId = null;
 
     protected $_plainTemplateMode = false;
+
+    /**
+     * @var bool|string
+     */
+    protected $_inlineCssFile = false;
 
     /**
      * Setup callbacks for filters
@@ -489,6 +494,45 @@ class Mage_Core_Model_Email_Template_Filter extends Varien_Filter_Template
             }
         }
         return $customVarValue;
+    }
+
+    /**
+     * This directive will allow CSS files to be applied inline to the HTML in the email template.
+     * Syntax: {{inlinecss file=""}}  If this directive is used, the file will be stored on this object so that
+     * it can be retrieved later
+     *
+     * @param $construction
+     * @return string
+     */
+    public function inlinecssDirective($construction)
+    {
+        $params = $this->_getIncludeParameters($construction[2]);
+        if (isset($params['file'])) {
+            $this->_setInlineCssFile($params['file']);
+        }
+        return '';
+    }
+
+    /**
+     * Set filename of CSS file to inline
+     *
+     * @param $filename
+     * @return $this
+     */
+    protected function _setInlineCssFile($filename)
+    {
+        $this->_inlineCssFile = $filename;
+        return $this;
+    }
+
+    /**
+     * Get filename of CSS file to inline
+     *
+     * @return bool|string
+     */
+    public function getInlineCssFile()
+    {
+        return $this->_inlineCssFile;
     }
 
     /**

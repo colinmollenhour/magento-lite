@@ -20,8 +20,8 @@
  *
  * @category    Mage
  * @package     Mage_Eav
- * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 
@@ -64,7 +64,7 @@ class Mage_Eav_Model_Attribute_Data_Text extends Mage_Eav_Model_Attribute_Data_A
             $value = $this->getEntity()->getDataUsingMethod($attribute->getAttributeCode());
         }
 
-        if ($attribute->getIsRequired() && empty($value)) {
+        if ($attribute->getIsRequired() && strlen($value) == 0) {
             $errors[] = Mage::helper('eav')->__('"%s" is a required value.', $label);
         }
 

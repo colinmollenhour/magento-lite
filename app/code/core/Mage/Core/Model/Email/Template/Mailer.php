@@ -20,12 +20,15 @@
  *
  * @category    Mage
  * @package     Mage_Core
- * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
  * Email Template Mailer Model
+ *
+ * @method Mage_Core_Model_Email_Template_Mailer setQueue(Mage_Core_Model_Abstract $value)
+ * @method Mage_Core_Model_Email_Queue getQueue()
  *
  * @category    Mage
  * @package     Mage_Core
@@ -61,21 +64,23 @@ class Mage_Core_Model_Email_Template_Mailer extends Varien_Object
      */
     public function send()
     {
+        /** @var $emailTemplate Mage_Core_Model_Email_Template */
         $emailTemplate = Mage::getModel('core/email_template');
         // Send all emails from corresponding list
         while (!empty($this->_emailInfos)) {
             $emailInfo = array_pop($this->_emailInfos);
-            // Handle "Bcc" recepients of the current email
+            // Handle "Bcc" recipients of the current email
             $emailTemplate->addBcc($emailInfo->getBccEmails());
             // Set required design parameters and delegate email sending to Mage_Core_Model_Email_Template
             $emailTemplate->setDesignConfig(array('area' => 'frontend', 'store' => $this->getStoreId()))
+                ->setQueue($this->getQueue())
                 ->sendTransactional(
-                $this->getTemplateId(),
-                $this->getSender(),
-                $emailInfo->getToEmails(),
-                $emailInfo->getToNames(),
-                $this->getTemplateParams(),
-                $this->getStoreId()
+                    $this->getTemplateId(),
+                    $this->getSender(),
+                    $emailInfo->getToEmails(),
+                    $emailInfo->getToNames(),
+                    $this->getTemplateParams(),
+                    $this->getStoreId()
             );
         }
         return $this;

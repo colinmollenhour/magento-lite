@@ -20,8 +20,8 @@
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
@@ -78,7 +78,10 @@ class Mage_Adminhtml_Model_System_Config_Backend_File extends Mage_Core_Model_Co
             }
         } else {
             if (is_array($value) && !empty($value['delete'])) {
-                $this->setValue('');
+                // Delete record before it is saved
+                $this->delete();
+                // Prevent record from being saved, since it was just deleted
+                $this->_dataSaveAllowed = false;
             } else {
                 $this->unsValue();
             }

@@ -20,8 +20,8 @@
  *
  * @category    Mage
  * @package     Mage_Eav
- * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 
@@ -431,7 +431,7 @@ class Mage_Eav_Model_Resource_Entity_Attribute extends Mage_Core_Model_Resource_
     public function getFlatUpdateSelect(Mage_Eav_Model_Entity_Attribute_Abstract $attribute, $storeId)
     {
         $adapter = $this->_getReadAdapter();
-        $joinConditionTemplate = "%s.entity_id=%s.entity_id"
+        $joinConditionTemplate = "%s.entity_id = %s.entity_id"
             ." AND %s.entity_type_id = ".$attribute->getEntityTypeId()
             ." AND %s.attribute_id = ".$attribute->getId()
             ." AND %s.store_id = %d";
@@ -452,7 +452,7 @@ class Mage_Eav_Model_Resource_Entity_Attribute extends Mage_Core_Model_Resource_
                 array())
             ->joinLeft(
                 array('t2' => $attribute->getBackend()->getTable()),
-                sprintf($joinConditionTemplate, 't1', 't2', 't2', 't2', 't2', $storeId),
+                sprintf($joinConditionTemplate, 'e', 't2', 't2', 't2', 't2', $storeId),
                 array($attribute->getAttributeCode() => $valueExpr));
         if ($attribute->getFlatAddChildData()) {
             $select->where("e.is_child = ?", 0);

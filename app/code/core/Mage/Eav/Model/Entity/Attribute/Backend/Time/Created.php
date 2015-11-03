@@ -20,8 +20,8 @@
  *
  * @category    Mage
  * @package     Mage_Eav
- * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
@@ -33,8 +33,22 @@
  */
 class Mage_Eav_Model_Entity_Attribute_Backend_Time_Created extends Mage_Eav_Model_Entity_Attribute_Backend_Abstract
 {
+
+    /**
+     * Returns date format if it matches a certain mask.
+     * @param $date
+     * @return null|string
+     */
+    protected function _getFormat($date)
+    {
+        if (is_string($date) && preg_match('#^\d{4,4}-\d{2,2}-\d{2,2} \d{2,2}:\d{2,2}:\d{2,2}$#', $date)) {
+            return 'yyyy-MM-dd HH:mm:ss';
+        }
+        return null;
+    }
     /**
      * Set created date
+     * Set created date in UTC time zone
      *
      * @param Mage_Core_Model_Object $object
      * @return Mage_Eav_Model_Entity_Attribute_Backend_Time_Created
@@ -42,9 +56,35 @@ class Mage_Eav_Model_Entity_Attribute_Backend_Time_Created extends Mage_Eav_Mode
     public function beforeSave($object)
     {
         $attributeCode = $this->getAttribute()->getAttributeCode();
-        if ($object->isObjectNew() && is_null($object->getData($attributeCode))) {
-            $object->setData($attributeCode, Varien_Date::now());
+        $date = $object->getData($attributeCode);
+        if (is_null($date)) {
+            if ($object->isObjectNew()) {
+                $object->setData($attributeCode, Varien_Date::now());
+            }
+        } else {
+            // convert to UTC
+            $zendDate = Mage::app()->getLocale()->utcDate(null, $date, true, $this->_getFormat($date));
+            $object->setData($attributeCode, $zendDate->getIso());
         }
+
+        return $this;
+    }
+
+    /**
+     * Convert create date from UTC to current store time zone
+     *
+     * @param Varien_Object $object
+     * @return Mage_Eav_Model_Entity_Attribute_Backend_Time_Created
+     */
+    public function afterLoad($object)
+    {
+        $attributeCode = $this->getAttribute()->getAttributeCode();
+        $date = $object->getData($attributeCode);
+
+        $zendDate = Mage::app()->getLocale()->storeDate(null, $date, true, $this->_getFormat($date));
+        $object->setData($attributeCode, $zendDate->getIso());
+
+        parent::afterLoad($object);
 
         return $this;
     }

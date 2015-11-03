@@ -20,8 +20,8 @@
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
@@ -181,6 +181,19 @@ class Mage_Adminhtml_Permissions_RoleController extends Mage_Adminhtml_Controlle
         if (!$role->getId() && $rid) {
             Mage::getSingleton('adminhtml/session')->addError($this->__('This Role no longer exists.'));
             $this->_redirect('*/*/');
+            return;
+        }
+
+        //Validate current admin password
+        $currentPassword = $this->getRequest()->getParam('current_password', null);
+        $this->getRequest()->setParam('current_password', null);
+        $result = $this->_validateCurrentPassword($currentPassword);
+
+        if (is_array($result)) {
+            foreach ($result as $error) {
+                $this->_getSession()->addError($error);
+            }
+            $this->_redirect('*/*/editrole', array('rid' => $rid));
             return;
         }
 

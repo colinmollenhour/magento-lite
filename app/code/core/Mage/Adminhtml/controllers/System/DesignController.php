@@ -20,8 +20,8 @@
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 
@@ -75,6 +75,10 @@ class Mage_Adminhtml_System_DesignController extends Mage_Adminhtml_Controller_A
     public function saveAction()
     {
         if ($data = $this->getRequest()->getPost()) {
+            if (!empty($data['design'])) {
+                $data['design'] = $this->_filterDates($data['design'], array('date_from', 'date_to'));
+            }
+
             $id = (int) $this->getRequest()->getParam('id');
 
             $design = Mage::getModel('core/design');

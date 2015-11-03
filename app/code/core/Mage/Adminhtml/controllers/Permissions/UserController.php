@@ -20,8 +20,8 @@
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 class Mage_Adminhtml_Permissions_UserController extends Mage_Adminhtml_Controller_Action
 {
@@ -106,6 +106,13 @@ class Mage_Adminhtml_Permissions_UserController extends Mage_Adminhtml_Controlle
                 $this->_redirect('*/*/');
                 return;
             }
+
+            //Validate current admin password
+            $currentPassword = $this->getRequest()->getParam('current_password', null);
+            $this->getRequest()->setParam('current_password', null);
+            unset($data['current_password']);
+            $result = $this->_validateCurrentPassword($currentPassword);
+
             $model->setData($data);
 
             /*
@@ -118,7 +125,9 @@ class Mage_Adminhtml_Permissions_UserController extends Mage_Adminhtml_Controlle
                 $model->unsPasswordConfirmation();
             }
 
-            $result = $model->validate();
+            if (!is_array($result)) {
+                $result = $model->validate();
+            }
             if (is_array($result)) {
                 Mage::getSingleton('adminhtml/session')->setUserData($data);
                 foreach ($result as $message) {

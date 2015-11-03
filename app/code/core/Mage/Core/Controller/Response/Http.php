@@ -20,8 +20,8 @@
  *
  * @category    Mage
  * @package     Mage_Core
- * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 
@@ -74,6 +74,7 @@ class Mage_Core_Controller_Response_Http extends Zend_Controller_Response_Http
                 }
             }
         }
+
         return parent::sendHeaders();
     }
 
@@ -104,5 +105,14 @@ class Mage_Core_Controller_Response_Http extends Zend_Controller_Response_Http
                 array('response' => $this, 'transport' => self::$_transportObject));
 
         return parent::setRedirect(self::$_transportObject->getUrl(), self::$_transportObject->getCode());
+    }
+
+    /**
+     * Method send already collected headers and exit from script
+     */
+    public function sendHeadersAndExit()
+    {
+        $this->sendHeaders();
+        exit;
     }
 }

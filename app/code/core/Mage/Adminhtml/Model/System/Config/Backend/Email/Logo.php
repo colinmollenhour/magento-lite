@@ -20,8 +20,8 @@
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
  /**
@@ -71,25 +71,5 @@ class Mage_Adminhtml_Model_System_Config_Backend_Email_Logo extends Mage_Adminht
     protected function _addWhetherScopeInfo()
     {
         return true;
-    }
-
-    /**
-     * Save uploaded file before saving config value
-     *
-     * Save changes and delete file if "delete" option passed
-     *
-     * @return Mage_Adminhtml_Model_System_Config_Backend_Email_Logo
-     */
-    protected function _beforeSave()
-    {
-        $value       = $this->getValue();
-        $deleteFlag  = (is_array($value) && !empty($value['delete']));
-        $fileTmpName = $_FILES['groups']['tmp_name'][$this->getGroupId()]['fields'][$this->getField()]['value'];
-
-        if ($this->getOldValue() && ($fileTmpName || $deleteFlag)) {
-            $io = new Varien_Io_File();
-            $io->rm($this->_getUploadRoot(self::UPLOAD_ROOT_TOKEN) . DS . self::UPLOAD_DIR . DS . $this->getOldValue());
-        }
-        return parent::_beforeSave();
     }
 }
