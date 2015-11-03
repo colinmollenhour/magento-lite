@@ -89,7 +89,6 @@ class Mage_Core_Model_Resource
                 $connection->setCacheAdapter(Mage::app()->getCache());
                 unset($this->_skippedConnections[$name]);
             }
-
             return $connection;
         }
         $connConfig = Mage::getConfig()->getResourceConnectionConfig($name);
