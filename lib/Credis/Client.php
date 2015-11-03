@@ -1,37 +1,5 @@
 <?php
 /**
- * Magento
- *
- * NOTICE OF LICENSE
- *
- * This source file is subject to the Open Software License (OSL 3.0)
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/osl-3.0.php
- * If you did not receive a copy of the license and are unable to
- * obtain it through the world-wide-web, please send an email
- * to license@magentocommerce.com so we can send you a copy immediately.
- *
- * DISCLAIMER
- *
- * Do not edit or add to this file if you wish to upgrade Magento to newer
- * versions in the future. If you wish to customize Magento for your
- * needs please refer to http://www.magentocommerce.com for more information.
- *
- * @category  Credis
- * @package   Credis
- * @copyright Copyright (c) 2010 Magento Inc. (http://www.magentocommerce.com)
- * @license   http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
- *
- * Summary of changes: 
- * - code modified to follow Magento coding standards
- */
-
-/**
- * Copyright (c) 2009 Justin Poliey <jdp34@njit.edu>
- * Copyright (c) 2011 Colin Mollenhour <colin@mollenhour.com>
- * Licensed under MIT license http://www.opensource.org/licenses/mit-license.php
- *
  * Credis_Client (a fork of Redisent)
  *
  * Most commands are compatible with phpredis library:
@@ -46,26 +14,10 @@
  * - Reconnects automatically unless a watch or transaction is in progress.
  * - Can set automatic retry connection attempts for iffy Redis connections.
  *
- * Permission is hereby granted, free of charge, to any person
- * obtaining a copy of this software and associated documentation
- * files (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use,
- * copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following
- * conditions:
- *
- * The above copyright notice and this permission notice shall be
- * included in all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
- * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
- * OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
- * NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
- * WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
- * OTHER DEALINGS IN THE SOFTWARE.
+ * @author Colin Mollenhour <colin@mollenhour.com>
+ * @copyright 2011 Colin Mollenhour <colin@mollenhour.com>
+ * @license http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @package Credis_Client
  */
 
 if (!defined('CRLF')) {
