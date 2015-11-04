@@ -21,7 +21,7 @@
  * @category    Mage
  * @package     Mage_Adminhtml
  * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 class Mage_Adminhtml_Block_System_Design_Edit extends Mage_Adminhtml_Block_Widget
@@ -53,11 +53,15 @@ class Mage_Adminhtml_Block_System_Design_Edit extends Mage_Adminhtml_Block_Widge
                 ))
         );
 
+        $confirmationMessage = Mage::helper('core')->jsQuoteEscape(
+            Mage::helper('core')->__('Are you sure?')
+        );
         $this->setChild('delete_button',
             $this->getLayout()->createBlock('adminhtml/widget_button')
                 ->setData(array(
                     'label'     => Mage::helper('core')->__('Delete'),
-                    'onclick'   => 'confirmSetLocation(\''.Mage::helper('core')->__('Are you sure?').'\', \''.$this->getDeleteUrl().'\')',
+                    'onclick'   => 'confirmSetLocation(\'' . $confirmationMessage . '\', \'' . $this->getDeleteUrl()
+                        . '\')',
                     'class'  => 'delete'
                 ))
         );

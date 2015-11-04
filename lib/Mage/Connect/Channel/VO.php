@@ -21,15 +21,15 @@
  * @category    Mage
  * @package     Mage_Connect
  * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 
 class Mage_Connect_Channel_VO implements Iterator
 {
-    
+
     private $_validator = null;
-    
+
     protected $properties = array(
         'name' => '',
         'uri' => '',
@@ -81,7 +81,7 @@ class Mage_Connect_Channel_VO implements Iterator
     {
         return array('channel' => $this->properties);
     }
-     
+
     public function fromArray(array $arr)
     {
         foreach($arr as $k=>$v) {
@@ -89,15 +89,15 @@ class Mage_Connect_Channel_VO implements Iterator
         }
     }
 
-    
+
     private function validator()
-    { 
+    {
         if(is_null($this->_validator)) {
             $this->_validator = new Mage_Connect_Validator();
         }
         return $this->_validator;
     }
-    
+
     /**
      Stub for validation result
      */

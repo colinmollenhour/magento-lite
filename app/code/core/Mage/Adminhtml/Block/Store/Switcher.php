@@ -21,7 +21,7 @@
  * @category    Mage
  * @package     Mage_Adminhtml
  * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
@@ -250,7 +250,7 @@ class Mage_Adminhtml_Block_Store_Switcher extends Mage_Adminhtml_Block_Template
             $html = '<a'
                 . ' href="'. $this->escapeUrl($url) . '"'
                 . ' onclick="this.target=\'_blank\'"'
-                . ' title="' . $this->__('What is this?') . '"'
+                . ' title="' . Mage::helper('core')->quoteEscape($this->__('What is this?')) . '"'
                 . ' class="link-store-scope">'
                 . $this->__('What is this?')
                 . '</a>';

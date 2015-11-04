@@ -21,7 +21,7 @@
  * @category    Mage
  * @package     Mage_Cron
  * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 
@@ -41,5 +41,17 @@ class Mage_Cron_Model_Resource_Schedule_Collection extends Mage_Core_Model_Resou
     public function _construct()
     {
         $this->_init('cron/schedule');
+    }
+
+    /**
+     * Sort order by scheduled_at time
+     *
+     * @param string $dir
+     * @return Mage_Cron_Model_Resource_Schedule_Collection
+     */
+    public function orderByScheduledAt($dir = self::SORT_ORDER_ASC)
+    {
+        $this->getSelect()->order('scheduled_at', $dir);
+        return $this;
     }
 }

@@ -21,7 +21,7 @@
  * @category    Mage
  * @package     Mage_HTTP
  * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
@@ -31,54 +31,54 @@
  * @package     Mage_Connect
  * @author      Magento Core Team <core@magentocommerce.com>
  */
- 
+
 class Mage_HTTP_Client
 {
 
-	/**
-	 * Disallow to instantiate - pvt constructor
-	 */
-	private function __construct()
-	{
-		
-	}
-	
+    /**
+     * Disallow to instantiate - pvt constructor
+     */
+    private function __construct()
+    {
 
-	/**
-	 * Factory for HTTP client
-	 * @param string/false $frontend  'curl'/'socket' or false for auto-detect
-	 * @return Mage_HTTP_IClient
-	 */
-	public static function getInstance($frontend = false) 
-	{
-		if(false === $frontend)  
-		{
-            $frontend = self::detectFrontend();            			
-		}
-		if(false === $frontend)
-		{ 
-			throw new Exception("Cannot find frontend automatically, set it manually");
-		}
-		
-		$class = __CLASS__."_".str_replace(' ', DIRECTORY_SEPARATOR, ucwords(str_replace('_', ' ', $frontend)));
-		$obj = new $class();
-		return $obj;
-	}
-	
-	/**
-	 * Detects frontend type.
-	 * Priority is given to CURL
-	 * 
-	 * @return string/bool
-	 */
-	protected static function detectFrontend()
-	{
-	   if(function_exists("curl_init")) {
-	   	   return "curl";	   	
-	   }
-	   if(function_exists("fsockopen")) {
-	   	   return "socket";
-	   }
-	   return false;	   
-	}
+    }
+
+
+    /**
+     * Factory for HTTP client
+     * @param string/false $frontend  'curl'/'socket' or false for auto-detect
+     * @return Mage_HTTP_IClient
+     */
+    public static function getInstance($frontend = false)
+    {
+        if(false === $frontend)
+        {
+            $frontend = self::detectFrontend();
+        }
+        if(false === $frontend)
+        {
+            throw new Exception("Cannot find frontend automatically, set it manually");
+        }
+
+        $class = __CLASS__."_".str_replace(' ', DIRECTORY_SEPARATOR, ucwords(str_replace('_', ' ', $frontend)));
+        $obj = new $class();
+        return $obj;
+    }
+
+    /**
+     * Detects frontend type.
+     * Priority is given to CURL
+     *
+     * @return string/bool
+     */
+    protected static function detectFrontend()
+    {
+       if(function_exists("curl_init")) {
+              return "curl";
+       }
+       if(function_exists("fsockopen")) {
+              return "socket";
+       }
+       return false;
+    }
 }

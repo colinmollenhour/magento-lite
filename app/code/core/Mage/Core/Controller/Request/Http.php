@@ -76,6 +76,13 @@ class Mage_Core_Controller_Request_Http extends Zend_Controller_Request_Http
     protected $_beforeForwardInfo = array();
 
     /**
+     * Flag for recognizing if request internally forwarded
+     *
+     * @var bool
+     */
+    protected $_internallyForwarded = false;
+
+    /**
      * Returns ORIGINAL_PATH_INFO.
      * This value is calculated instead of reading PATH_INFO
      * directly from $_SERVER due to cross-platform differences.
@@ -291,11 +298,19 @@ class Mage_Core_Controller_Request_Http extends Zend_Controller_Request_Http
         if (!isset($_SERVER['HTTP_HOST'])) {
             return false;
         }
+        $host = $_SERVER['HTTP_HOST'];
         if ($trimPort) {
-            $host = explode(':', $_SERVER['HTTP_HOST']);
-            return $host[0];
+            $hostParts = explode(':', $_SERVER['HTTP_HOST']);
+            $host =  $hostParts[0];
         }
-        return $_SERVER['HTTP_HOST'];
+
+        if (strpos($host, ',') !== false || strpos($host, ';') !== false) {
+            $response = new Zend_Controller_Response_Http();
+            $response->setHttpResponseCode(400)->sendHeaders();
+            exit();
+        }
+
+        return $host;
     }
 
     /**
@@ -533,5 +548,27 @@ class Mage_Core_Controller_Request_Http extends Zend_Controller_Request_Http
             return true;
         }
         return false;
+    }
+
+    /**
+     * Define that request was forwarded internally
+     *
+     * @param boolean $flag
+     * @return Mage_Core_Controller_Request_Http
+     */
+    public function setInternallyForwarded($flag = true)
+    {
+        $this->_internallyForwarded = (bool)$flag;
+        return $this;
+    }
+
+    /**
+     * Checks if request was forwarded internally
+     *
+     * @return bool
+     */
+    public function getInternallyForwarded()
+    {
+        return $this->_internallyForwarded;
     }
 }

@@ -18,8 +18,8 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magento.com for more information.
  *
- * @category   Mage
- * @package    Mage
+ * @category    Mage
+ * @package     Mage
  * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -33,11 +33,6 @@ Whoops, it looks like you have an invalid PHP version.</h3></div><p>Magento supp
  Magento using PHP-CGI as a work-around.</p></div>';
     exit;
 }
-
-/**
- * Error reporting
- */
-error_reporting(E_ALL | E_STRICT);
 
 /**
  * Compilation includes configuration file
@@ -66,6 +61,7 @@ if (file_exists($maintenanceFile)) {
     exit;
 }
 
+require MAGENTO_ROOT . '/app/bootstrap.php';
 require_once $mageFilename;
 
 #Varien_Profiler::enable();

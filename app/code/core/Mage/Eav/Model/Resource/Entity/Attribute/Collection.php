@@ -21,7 +21,7 @@
  * @category    Mage
  * @package     Mage_Eav
  * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 
@@ -134,7 +134,7 @@ class Mage_Eav_Model_Resource_Entity_Attribute_Collection extends Mage_Core_Mode
                 'entity_attribute.attribute_id = main_table.attribute_id'
             );
             $this->addFieldToFilter('entity_attribute.attribute_set_id', $setId);
-            $this->setOrder('sort_order', self::SORT_ORDER_ASC);
+            $this->setOrder('entity_attribute.sort_order', self::SORT_ORDER_ASC);
         }
 
         return $this;
@@ -156,7 +156,7 @@ class Mage_Eav_Model_Resource_Entity_Attribute_Collection extends Mage_Core_Mode
             'attribute_id'
         );
         $this->addFieldToFilter('entity_attribute.attribute_set_id', array('in' => $setIds));
-        $this->setOrder('sort_order', self::SORT_ORDER_ASC);
+        $this->setOrder('entity_attribute.sort_order', self::SORT_ORDER_ASC);
 
         return $this;
     }
@@ -203,7 +203,7 @@ class Mage_Eav_Model_Resource_Entity_Attribute_Collection extends Mage_Core_Mode
             'entity_attribute.attribute_id = main_table.attribute_id'
         );
         $this->addFieldToFilter('entity_attribute.attribute_set_id', array('neq' => $setId));
-        $this->setOrder('sort_order', self::SORT_ORDER_ASC);
+        $this->setOrder('entity_attribute.sort_order', self::SORT_ORDER_ASC);
 
         return $this;
     }
@@ -232,7 +232,7 @@ class Mage_Eav_Model_Resource_Entity_Attribute_Collection extends Mage_Core_Mode
             'entity_attribute.attribute_id = main_table.attribute_id'
         );
         $this->addFieldToFilter('entity_attribute.attribute_group_id', $groupId);
-        $this->setOrder('sort_order', self::SORT_ORDER_ASC);
+        $this->setOrder('entity_attribute.sort_order', self::SORT_ORDER_ASC);
 
         return $this;
     }

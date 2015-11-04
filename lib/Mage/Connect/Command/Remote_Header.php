@@ -21,7 +21,7 @@
  * @category    Mage
  * @package     Mage_Connect
  * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 $commands = array(
@@ -85,4 +85,4 @@ Clear the XML-RPC/REST cache.  See also the cache_ttl configuration
 parameter.
 ',
             ),
-        ); 
+        );
