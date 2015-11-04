@@ -18,8 +18,8 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magento.com for more information.
  *
- * @category   Varien
- * @package    Varien_Data
+ * @category    Varien
+ * @package     Varien_Data
  * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -410,8 +410,14 @@ class Varien_Data_Collection_Db extends Varien_Data_Collection
      */
     protected function _translateCondition($field, $condition)
     {
-        $field = $this->_getMappedField($field);
-        return $this->_getConditionSql($field, $condition);
+        $mappedField = $this->_getMappedField($field);
+
+        $quotedField = $mappedField;
+        if ($mappedField === $field) {
+            $quotedField = $this->getConnection()->quoteIdentifier($field);
+        }
+
+        return $this->_getConditionSql($quotedField, $condition);
     }
 
     /**
@@ -474,7 +480,7 @@ class Varien_Data_Collection_Db extends Varien_Data_Collection
      * If non matched - sequential array is expected and OR conditions
      * will be built using above mentioned structure
      *
-     * @param string $fieldName
+     * @param string $fieldName Field name must be already escaped with Varien_Db_Adapter_Interface::quoteIdentifier()
      * @param integer|string|array $condition
      * @return string
      */

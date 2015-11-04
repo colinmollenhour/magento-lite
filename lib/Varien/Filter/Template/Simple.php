@@ -18,27 +18,69 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magento.com for more information.
  *
- * @category   Varien
- * @package    Varien_Filter
+ * @category    Varien
+ * @package     Varien_Filter
  * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
-
+/**
+ * Class Varien_Filter_Template_Simple
+ */
 class Varien_Filter_Template_Simple extends Varien_Object implements Zend_Filter_Interface
 {
-	protected $_startTag = '{{';
-	protected $_endTag = '}}';
+    /**
+     * Start tag for variable in template
+     *
+     * @var string
+     */
+    protected $_startTag = '{{';
 
-	public function setTags($start, $end)
-	{
-		$this->_startTag = $start;
-		$this->_endTag = $end;
-		return $this;
-	}
+    /**
+     * End tag for variable in template
+     *
+     * @var string
+     */
+    protected $_endTag = '}}';
 
-	public function filter($value)
-	{
-		return preg_replace('#'.$this->_startTag.'(.*?)'.$this->_endTag.'#e', '$this->getData("$1")', $value);
-	}
+    /**
+     * Define start tag and end tag
+     *
+     * @param string $start
+     * @param string $end
+     * @return Varien_Filter_Template_Simple
+     */
+    public function setTags($start, $end)
+    {
+        $this->_startTag = $start;
+        $this->_endTag = $end;
+        return $this;
+    }
+
+    /**
+     * Return result of getData method for matched variables
+     *
+     * @param array $matches
+     * @return mixed
+     */
+    protected function _filterDataItem($matches)
+    {
+        return $this->getData($matches[1]);
+    }
+
+    /**
+     * Insert data to template
+     *
+     * @param string $value
+     * @return string
+     */
+    public function filter($value)
+    {
+        return preg_replace_callback(
+            '#' . $this->_startTag . '(.*?)' . $this->_endTag . '#',
+            array($this, '_filterDataItem'),
+            $value
+        );
+    }
 }
+

@@ -21,7 +21,7 @@
  * @category    Mage
  * @package     Mage_Admin
  * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 
@@ -67,5 +67,19 @@ class Mage_Admin_Model_Resource_Rules_Collection extends Mage_Core_Model_Resourc
         $this->getSelect()->order('length ' . Zend_Db_Select::SQL_DESC);
 
         return $this;
+    }
+
+    /**
+     * Generate and retrieve a resource - permissions map
+     * @return array
+     */
+    public function getResourcesPermissionsArray()
+    {
+        $resourcesPermissionsArray = array();
+        foreach ($this as $item) {
+            $resourcesPermissionsArray[$item->getResourceId()] = $item->getPermission();
+        }
+
+        return $resourcesPermissionsArray;
     }
 }

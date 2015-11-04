@@ -18,8 +18,8 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magento.com for more information.
  *
- * @category   Varien
- * @package    Varien_Io
+ * @category    Varien
+ * @package     Varien_Io
  * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -99,10 +99,16 @@ class Varien_Io_File extends Varien_Io_Abstract
      */
     protected $_streamLocked = false;
 
+    public function __construct()
+    {
+        // Initialize shutdown function
+        register_shutdown_function(array($this, 'destruct'));
+    }
+
     /**
-     * Destruct
+     * stream close on shutdown
      */
-    public function __destruct()
+    public function destruct()
     {
         if ($this->_streamHandler) {
             $this->streamClose();
@@ -226,6 +232,17 @@ class Varien_Io_File extends Varien_Io_Abstract
         if (!$this->_streamHandler) {
             return false;
         }
+
+        /**
+         * Security enchancement for CSV data processing by Excel-like applications.
+         * @see https://bugzilla.mozilla.org/show_bug.cgi?id=1054702
+         */
+        foreach ($row as $key => $value) {
+            if (substr($value, 0, 1) === '=') {
+                $row[$key] = ' ' . $value;
+            }
+        }
+
         return @fputcsv($this->_streamHandler, $row, $delimiter, $enclosure);
     }
 

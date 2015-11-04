@@ -21,7 +21,7 @@
  * @category    Mage
  * @package     Mage_HTTP
  * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
@@ -376,7 +376,7 @@ implements Mage_HTTP_IClient
             }
             $this->curlOption(CURLOPT_COOKIE, implode(";", $cookies));
         }
-         
+
         if($this->_timeout) {
             $this->curlOption(CURLOPT_TIMEOUT, $this->_timeout);
         }
@@ -388,7 +388,7 @@ implements Mage_HTTP_IClient
         //$this->curlOption(CURLOPT_HEADER, 1);
         $this->curlOption(CURLOPT_RETURNTRANSFER, 1);
         $this->curlOption(CURLOPT_HEADERFUNCTION, array($this,'parseHeaders'));
-         
+
 
         if(count($this->_curlUserOptions)) {
             foreach($this->_curlUserOptions as $k=>$v) {
@@ -455,7 +455,7 @@ implements Mage_HTTP_IClient
 
         }
         $this->_headerCount++;
-         
+
 
         return strlen($data);
     }

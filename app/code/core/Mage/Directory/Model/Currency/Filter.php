@@ -21,7 +21,7 @@
  * @category    Mage
  * @package     Mage_Directory
  * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
@@ -72,7 +72,7 @@ class Mage_Directory_Model_Currency_Filter implements Zend_Filter_Interface
         $value = Mage::app()->getLocale()->getNumber($value);
         $value = Mage::app()->getStore()->roundPrice($this->_rate*$value);
         //$value = round($value, 2);
-        $value = sprintf("%f", $value);
+        $value = sprintf("%F", $value);
         return $this->_currency->toCurrency($value);
     }
 }

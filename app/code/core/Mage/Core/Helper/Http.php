@@ -21,7 +21,7 @@
  * @category    Mage
  * @package     Mage_Core
  * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
@@ -146,7 +146,7 @@ class Mage_Core_Helper_Http extends Mage_Core_Helper_Abstract
             return false;
         }
 
-        return $ipToLong ? ip2long($this->_remoteAddr) : $this->_remoteAddr;
+        return $ipToLong ? inet_pton($this->_remoteAddr) : $this->_remoteAddr;
     }
 
     /**
@@ -161,7 +161,7 @@ class Mage_Core_Helper_Http extends Mage_Core_Helper_Abstract
         if (!$address) {
             return false;
         }
-        return $ipToLong ? ip2long($address) : $address;
+        return $ipToLong ? inet_pton($address) : $address;
     }
 
     /**

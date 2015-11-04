@@ -55,7 +55,7 @@
             if(checkbox[0]){
                 var checked = isInput ? !checkbox[0].checked : checkbox[0].checked;
                 if (checked) {
-                    if ( confirm("<?php echo $this->__('Warning!\r\nThis action will remove this user from already assigned role\r\nAre you sure?') ?>") ) {
+                    if ( confirm('<?php echo Mage::helper('core')->jsQuoteEscape($this->__('Warning!\r\nThis action will remove this user from already assigned role\r\nAre you sure?')) ?>') ) {
                         checkbox[0].checked = false;
                         checkBoxes.unset(checkbox[0].value);
                         varienElementMethods.setHasChanges(checkbox[0]);
@@ -91,7 +91,7 @@
     function massSelectUsers(allCheckbox)
     {
         if (!allCheckbox.checked && checkBoxes.size() > 0) {
-            if (!confirm("<?php echo $this->__('Warning!\r\nThis action will remove those users from already assigned roles\r\nAre you sure?') ?>") ) {
+            if (!confirm('<?php echo Mage::helper('core')->jsQuoteEscape($this->__('Warning!\r\nThis action will remove those users from already assigned roles\r\nAre you sure?')) ?>') ) {
                 allCheckbox.checked = false;
                 return false;
             }

@@ -21,7 +21,7 @@
  * @category    Mage
  * @package     Mage_Eav
  * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 
@@ -695,6 +695,10 @@ abstract class Mage_Eav_Model_Entity_Attribute_Abstract extends Mage_Core_Model_
         $condition = $this->getUsedForSortBy();
         if ($this->getFlatAddFilterableAttributes()) {
             $condition = $condition || $this->getIsFilterable();
+        }
+
+        if ($this->getAttributeCode() == 'status') {
+            $condition = true;
         }
 
         if ($condition) {

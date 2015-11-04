@@ -18,8 +18,8 @@
  * versions in the future. If you wish to customize Magento for your
  * needs please refer to http://www.magento.com for more information.
  *
- * @category   Varien
- * @package    Varien_Simplexml
+ * @category    Varien
+ * @package     Varien_Simplexml
  * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
@@ -36,7 +36,7 @@ abstract class Varien_Simplexml_Config_Cache_Abstract extends Varien_Object
 {
     /**
      * Constructor
-     * 
+     *
      * Initializes components and allows to save the cache
      *
      * @param array $data
@@ -48,7 +48,7 @@ abstract class Varien_Simplexml_Config_Cache_Abstract extends Varien_Object
         $this->setComponents(array());
         $this->setIsAllowedToSave(true);
     }
-    
+
     /**
      * Add configuration component to stats
      *
@@ -62,10 +62,10 @@ abstract class Varien_Simplexml_Config_Cache_Abstract extends Varien_Object
             $comps[$component] = array('mtime'=>filemtime($component));
         }
         $this->setComponents($comps);
-        
+
         return $this;
     }
-    
+
     /**
      * Validate components in the stats
      *
@@ -74,9 +74,9 @@ abstract class Varien_Simplexml_Config_Cache_Abstract extends Varien_Object
      */
     public function validateComponents($data)
     {
-    	if (empty($data) || !is_array($data)) {
-    		return false;
-    	}
+        if (empty($data) || !is_array($data)) {
+            return false;
+        }
         // check that no source files were changed or check file exsists
         foreach ($data as $sourceFile=>$stat) {
             if (empty($stat['mtime']) || !is_file($sourceFile) || filemtime($sourceFile)!==$stat['mtime']) {

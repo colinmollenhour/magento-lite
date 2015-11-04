@@ -21,7 +21,7 @@
  * @category    Mage
  * @package     Mage_Core
  * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 
@@ -564,7 +564,7 @@ abstract class Mage_Core_Model_Resource_Db_Collection_Abstract extends Varien_Da
             $alias = $table;
         }
 
-        if (!isset($this->_joinedTables[$table])) {
+        if (!isset($this->_joinedTables[$alias])) {
             $this->getSelect()->join(
                 array($alias => $this->getTable($table)),
                 $cond,

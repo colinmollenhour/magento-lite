@@ -21,7 +21,7 @@
  * @category    Mage
  * @package     Mage_Backup
  * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 
@@ -130,16 +130,19 @@ class Mage_Backup_Model_Db
                 $backup->write($this->getResource()->getTableDataBeforeSql($table));
 
                 if ($tableStatus->getDataLength() > self::BUFFER_LENGTH) {
-                    if ($tableStatus->getAvgRowLength() < self::BUFFER_LENGTH) {
+                    if ($tableStatus->getAvgRowLength() > 0 && $tableStatus->getAvgRowLength() < self::BUFFER_LENGTH) {
+                        // Process rows in batches
                         $limit = floor(self::BUFFER_LENGTH / $tableStatus->getAvgRowLength());
                         $multiRowsLength = ceil($tableStatus->getRows() / $limit);
                     }
                     else {
+                        // Process rows one by one
                         $limit = 1;
                         $multiRowsLength = $tableStatus->getRows();
                     }
                 }
                 else {
+                    // Process all rows at once
                     $limit = $tableStatus->getRows();
                     $multiRowsLength = 1;
                 }

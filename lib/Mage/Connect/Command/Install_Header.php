@@ -21,18 +21,18 @@
  * @category    Mage
  * @package     Mage_Connect
  * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 $commands = array(
 
-		'install-file' => array(
+        'install-file' => array(
             'summary' => 'Install Package Archive File',
             'function' => 'doInstall',
             'shortcut' => 'if',
             'options' => array(),
-			'doc' => '',
-		),
+            'doc' => '',
+        ),
         'install' => array(
             'summary' => 'Install Package',
             'function' => 'doInstall',
@@ -64,7 +64,7 @@ $commands = array(
                 'ftp=' => array(
                     'shortopt' => 'r=',
                     'doc' => 'Remote side FTP connect string',
-                    ),                    
+                    ),
                 ),
             'doc' => '[channel/]<package> ...
 Installs one or more PEAR packages.  You can specify a package to
@@ -234,4 +234,4 @@ Uninstalls one or more PEAR packages.  More than one package may be
 specified at once.  Prefix with channel name to uninstall from a
 channel not in your default channel ({config default_channel})
 '),
-    ); 
+    );

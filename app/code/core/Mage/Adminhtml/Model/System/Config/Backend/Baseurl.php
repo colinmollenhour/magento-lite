@@ -21,7 +21,7 @@
  * @category    Mage
  * @package     Mage_Adminhtml
  * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 
@@ -32,6 +32,7 @@ class Mage_Adminhtml_Model_System_Config_Backend_Baseurl extends Mage_Core_Model
         $value = $this->getValue();
 
         if (!preg_match('#^{{((un)?secure_)?base_url}}#', $value)) {
+            $value = Mage::helper('core/url')->encodePunycode($value);
             $parsedUrl = parse_url($value);
             if (!isset($parsedUrl['scheme']) || !isset($parsedUrl['host'])) {
                 Mage::throwException(Mage::helper('core')->__('The %s you entered is invalid. Please make sure that it follows "http://domain.com/" format.', $this->getFieldConfig()->label));
@@ -59,5 +60,20 @@ class Mage_Adminhtml_Model_System_Config_Backend_Baseurl extends Mage_Core_Model
         if ($this->isValueChanged()) {
             Mage::getModel('core/design_package')->cleanMergedJsCss();
         }
+    }
+
+    /**
+     * Processing object after load data
+     *
+     * @return Mage_Core_Model_Abstract
+     */
+    protected function _afterLoad()
+    {
+        $value = $this->getValue();
+        if (!preg_match('#^{{((un)?secure_)?base_url}}#', $value)) {
+            $value = Mage::helper('core/url')->decodePunycode($value);
+        }
+        $this->setValue($value);
+        return parent::_afterLoad();
     }
 }

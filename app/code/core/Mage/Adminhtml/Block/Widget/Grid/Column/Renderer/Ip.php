@@ -21,7 +21,7 @@
  * @category    Mage
  * @package     Mage_Adminhtml
  * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
@@ -42,6 +42,10 @@ class Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Ip
      */
     public function render(Varien_Object $row)
     {
-        return long2ip($row->getData($this->getColumn()->getIndex()));
+        /**
+         * The output of the "inet_ntop" function was disabled to prevent an error throwing
+         * in case when the database value is not an ipv6 or an ipv4 binary representation (ex. NULL).
+         */
+        return @inet_ntop($row->getData($this->getColumn()->getIndex()));
     }
 }
