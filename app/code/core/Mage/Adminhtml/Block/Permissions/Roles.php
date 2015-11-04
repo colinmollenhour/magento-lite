@@ -21,7 +21,7 @@
  * @category    Mage
  * @package     Mage_Adminhtml
  * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
@@ -41,6 +41,16 @@ class Mage_Adminhtml_Block_Permissions_Roles extends Mage_Adminhtml_Block_Templa
     public function getAddNewUrl()
     {
         return $this->getUrl('*/*/editrole');
+    }
+
+    /**
+     * Get URL for refreshing role-rule relations
+     *
+     * @return string
+     */
+    public function getRefreshRolesUrl()
+    {
+        return $this->getUrl('*/*/refreshroles');
     }
 
     /**
