@@ -14,9 +14,9 @@
  *
  * @category  Zend
  * @package   Zend_Date
- * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd     New BSD License
- * @version   $Id: Date.php 22713 2010-07-29 11:41:56Z thomas $
+ * @version   $Id$
  */
 
 /**
@@ -33,7 +33,7 @@
  *
  * @category  Zend
  * @package   Zend_Date
- * @copyright  Copyright (c) 2005-2010 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2015 Zend Technologies USA Inc. (http://www.zend.com)
  * @license   http://framework.zend.com/license/new-bsd     New BSD License
  */
 class Zend_Date extends Zend_Date_DateObject
