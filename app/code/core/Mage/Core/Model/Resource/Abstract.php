@@ -20,8 +20,8 @@
  *
  * @category    Mage
  * @package     Mage_Core
- * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
@@ -122,6 +122,12 @@ abstract class Mage_Core_Model_Resource_Abstract
     public function rollBack()
     {
         $this->_getWriteAdapter()->rollBack();
+        if ($this->_getWriteAdapter()->getTransactionLevel() === 0) {
+            $adapterKey = spl_object_hash($this->_getWriteAdapter());
+            if (isset(self::$_commitCallbacks[$adapterKey])) {
+                self::$_commitCallbacks[$adapterKey] = array();
+            }
+        }
         return $this;
     }
 

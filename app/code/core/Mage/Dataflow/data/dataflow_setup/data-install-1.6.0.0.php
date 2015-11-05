@@ -20,8 +20,8 @@
  *
  * @category    Mage
  * @package     Mage_Dataflow
- * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 $installer = $this;
@@ -92,3 +92,5 @@ $dataflowData = array(
 foreach ($dataflowData as $bind) {
     Mage::getModel('dataflow/profile')->setData($bind)->save();
 }
+
+$installer->endSetup();

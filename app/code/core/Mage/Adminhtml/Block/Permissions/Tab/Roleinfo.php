@@ -20,15 +20,16 @@
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
  * implementing now
  *
  */
-class Mage_Adminhtml_Block_Permissions_Tab_Roleinfo extends Mage_Adminhtml_Block_Widget_Form implements Mage_Adminhtml_Block_Widget_Tab_Interface
+class Mage_Adminhtml_Block_Permissions_Tab_Roleinfo extends Mage_Adminhtml_Block_Widget_Form
+    implements Mage_Adminhtml_Block_Widget_Tab_Interface
 {
     public function getTabLabel()
     {
@@ -71,6 +72,15 @@ class Mage_Adminhtml_Block_Permissions_Tab_Roleinfo extends Mage_Adminhtml_Block
                 'id'    => 'role_name',
                 'class' => 'required-entry',
                 'required' => true,
+            )
+        );
+
+        $fieldset->addField('current_password', 'obscure',
+            array(
+                'name'  => 'current_password',
+                'label' => Mage::helper('adminhtml')->__('Current Admin Password'),
+                'title' => Mage::helper('adminhtml')->__('Current Admin Password'),
+                'required' => true
             )
         );
 

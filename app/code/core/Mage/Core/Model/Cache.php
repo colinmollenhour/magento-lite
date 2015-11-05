@@ -20,8 +20,8 @@
  *
  * @category    Mage
  * @package     Mage_Core
- * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
@@ -76,7 +76,7 @@ class Mage_Core_Model_Cache
      */
     protected $_defaultBackendOptions = array(
         'hashed_directory_level'    => 1,
-        'hashed_directory_umask'    => 0777,
+        'hashed_directory_perm'    => 0777,
         'file_name_prefix'          => 'mage',
     );
 
@@ -436,7 +436,7 @@ class Mage_Core_Model_Cache
     }
 
     /**
-     * Clean cached data by specific tag
+     * Flush cached data
      *
      * @return  bool
      */

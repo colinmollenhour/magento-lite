@@ -28,7 +28,7 @@
 <config>
     <modules>
         <Mage_Core>
-            <version>1.6.0.3</version>
+            <version>1.6.0.6</version>
         </Mage_Core>
     </modules>
     <global>
@@ -83,6 +83,12 @@
                     <flag>
                         <table>core_flag</table>
                     </flag>
+                    <email_queue>
+                        <table>core_email_queue</table>
+                    </email_queue>
+                    <email_recipients>
+                        <table>core_email_queue_recipients</table>
+                    </email_recipients>
                     <file_storage><table>core_file_storage</table></file_storage>
                     <directory_storage><table>core_directory_storage</table></directory_storage>
                 </entities>
@@ -99,7 +105,18 @@
             </core>
         </helpers>
         <template>
-            <email/>
+            <email>
+                <design_email_header translate="label" module="core">
+                    <label>Email - Header</label>
+                    <file>html/header.html</file>
+                    <type>text</type>
+                </design_email_header>
+                <design_email_footer translate="label" module="core">
+                    <label>Email - Footer</label>
+                    <file>html/footer.html</file>
+                    <type>text</type>
+                </design_email_footer>
+            </email>
         </template>
         <cache>
             <types>
@@ -152,6 +169,16 @@
         <request_rewrite>
             <model>core/url_rewrite_request</model>
         </request_rewrite>
+        <events>
+            <controller_action_predispatch>
+                <observers>
+                    <security_domain_policy>
+                        <class>Mage_Core_Model_Domainpolicy</class>
+                        <method>addDomainPolicyHeader</method>
+                    </security_domain_policy>
+                </observers>
+            </controller_action_predispatch>
+        </events>
     </global>
     <frontend>
         <routers>
@@ -241,7 +268,7 @@
             <package>
                 <area>frontend</area>
                 <default_theme>default</default_theme>
-                <name>default</name>
+                <name>rwd</name>
                 <theme>default</theme>
                 <translate>default</translate>
             </package>
@@ -249,6 +276,11 @@
                 <list_allow_all>1</list_allow_all>
                 <pagination_frame>5</pagination_frame>
             </pagination>
+            <email>
+                <css_non_inline>email-non-inline.css</css_non_inline>
+                <header>design_email_header</header>
+                <footer>design_email_footer</footer>
+            </email>
         </design>
         <dev>
             <restrict>
@@ -288,6 +320,7 @@
                     <compiled_css_secure_folder>css_secure</compiled_css_secure_folder>
                     <compiled_js_folder>js</compiled_js_folder>
                 </allowed_resources>
+                <ignored_resources>.svn,.htaccess</ignored_resources>
             </media_storage_configuration>
         </system>
         <trans_email>
@@ -377,6 +410,8 @@
             </url>
             <security>
                 <use_form_key>1</use_form_key>
+                <domain_policy_backend>2</domain_policy_backend>
+                <domain_policy_frontend>2</domain_policy_frontend>
             </security>
         </admin>
         <general>
@@ -448,6 +483,14 @@
                     <model>core/observer::cleanCache</model>
                 </run>
             </core_clean_cache>
+            <core_email_queue_send_all>
+                <schedule><cron_expr>*/1 * * * *</cron_expr></schedule>
+                <run><model>core/email_queue::send</model></run>
+            </core_email_queue_send_all>
+            <core_email_queue_clean_up>
+                <schedule><cron_expr>0 0 * * *</cron_expr></schedule>
+                <run><model>core/email_queue::cleanQueue</model></run>
+            </core_email_queue_clean_up>
         </jobs>
     </crontab>
 </config>

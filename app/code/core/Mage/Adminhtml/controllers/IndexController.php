@@ -20,8 +20,8 @@
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
@@ -308,7 +308,7 @@ class Mage_Adminhtml_IndexController extends Mage_Adminhtml_Controller_Action
             array_push($errorMessages, Mage::helper('adminhtml')->__('New password field cannot be empty.'));
         }
         /** @var $user Mage_Admin_Model_User */
-        $user = Mage::getModel('admin/user')->load($userId);
+        $user = $this->_getModel('admin/user')->load($userId);
 
         $user->setNewPassword($password);
         $user->setPasswordConfirmation($passwordConfirmation);
@@ -333,7 +333,6 @@ class Mage_Adminhtml_IndexController extends Mage_Adminhtml_Controller_Action
             // Empty current reset password token i.e. invalidate it
             $user->setRpToken(null);
             $user->setRpTokenCreatedAt(null);
-            $user->setPasswordConfirmation(null);
             $user->save();
             $this->_getSession()->addSuccess(Mage::helper('adminhtml')->__('Your password has been updated.'));
             $this->_redirect('*/*/login');
@@ -386,5 +385,18 @@ class Mage_Adminhtml_IndexController extends Mage_Adminhtml_Controller_Action
     protected function _isAllowed()
     {
         return true;
+    }
+
+    /**
+     * Retrieve model object
+     *
+     * @link    Mage_Core_Model_Config::getModelInstance
+     * @param   string $modelClass
+     * @param   array|object $arguments
+     * @return  Mage_Core_Model_Abstract|false
+     */
+    protected function _getModel($modelClass = '', $arguments = array())
+    {
+        return Mage::getModel($modelClass, $arguments);
     }
 }

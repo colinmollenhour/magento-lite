@@ -31,48 +31,55 @@
             <active>true</active>
             <codePool>core</codePool>
         </Mage_Core>
+        <Mage_Directory>
+            <active>true</active>
+            <codePool>core</codePool>
+            <depends>
+                <Mage_Core />
+            </depends>
+        </Mage_Directory>
+        <Mage_Dataflow>
+            <active>true</active>
+            <codePool>core</codePool>
+            <depends>
+                <Mage_Core />
+            </depends>
+        </Mage_Dataflow>
         <Mage_Page>
             <active>true</active>
             <codePool>core</codePool>
             <depends>
-                <Mage_Core/>
+                <Mage_Core />
             </depends>
         </Mage_Page>
         <Mage_Install>
             <active>true</active>
             <codePool>core</codePool>
             <depends>
-                <Mage_Core/>
+               <Mage_Core />
             </depends>
         </Mage_Install>
         <Mage_Admin>
             <active>true</active>
             <codePool>core</codePool>
             <depends>
-               <Mage_Core/>
+                <Mage_Core />
             </depends>
         </Mage_Admin>
         <Mage_Adminhtml>
             <active>true</active>
             <codePool>core</codePool>
             <depends>
-                <Mage_Admin/>
+                <Mage_Admin />
             </depends>
         </Mage_Adminhtml>
         <Mage_Cron>
             <active>true</active>
             <codePool>core</codePool>
             <depends>
-                <Mage_Core/>
+                <Mage_Core />
             </depends>
         </Mage_Cron>
-        <Mage_Directory>
-            <active>true</active>
-            <codePool>core</codePool>
-            <depends>
-                <Mage_Core/>
-            </depends>
-        </Mage_Directory>
         <Mage_Cms>
             <active>true</active>
             <codePool>core</codePool>
@@ -80,12 +87,12 @@
                 <Mage_Core/>
             </depends>
         </Mage_Cms>
-        <Mage_Dataflow>
+        <Mage_Widget>
             <active>true</active>
             <codePool>core</codePool>
             <depends>
-                <Mage_Core/>
+                <Mage_Cms />
             </depends>
-        </Mage_Dataflow>
+        </Mage_Widget>
     </modules>
 </config>

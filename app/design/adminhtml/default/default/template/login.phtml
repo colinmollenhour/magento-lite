@@ -52,7 +52,7 @@
                     <input name="form_key" type="hidden" value="<?php echo $this->getFormKey() ?>" />
                     <h2><?php echo Mage::helper('adminhtml')->__('Log in to Admin Panel') ?></h2>
                     <div id="messages">
-                        <?php echo $this->getMessagesBlock()->getGroupedHtml() ?>
+                        <?php echo $this->getMessagesBlock()->toHtml() ?>
                     </div>
                     <div class="input-box input-left"><label for="username"><?php echo Mage::helper('adminhtml')->__('User Name:') ?></label><br/>
                         <input type="text" id="username" name="login[username]" value="" class="required-entry input-text" /></div>

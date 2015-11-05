@@ -39,6 +39,7 @@ if (defined('COMPILER_INCLUDE_PATH')) {
     /**
      * Set include path
      */
+    $paths = array();
     $paths[] = BP . DS . 'app' . DS . 'code' . DS . 'local';
     $paths[] = BP . DS . 'app' . DS . 'code' . DS . 'community';
     $paths[] = BP . DS . 'app' . DS . 'code' . DS . 'core';
@@ -168,11 +169,11 @@ final class Mage
     {
         return array(
             'major'     => '1',
-            'minor'     => '8',
-            'revision'  => '0',
+            'minor'     => '9',
+            'revision'  => '1',
             'patch'     => '0',
-            'stability' => 'alpha',
-            'number'    => '1',
+            'stability' => '',
+            'number'    => '',
         );
     }
 

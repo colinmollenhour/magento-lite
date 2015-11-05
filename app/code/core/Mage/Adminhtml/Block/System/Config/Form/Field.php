@@ -20,8 +20,8 @@
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 
@@ -71,11 +71,11 @@ class Mage_Adminhtml_Block_System_Config_Form_Field
         $addInheritCheckbox = false;
         if ($element->getCanUseWebsiteValue()) {
             $addInheritCheckbox = true;
-            $checkboxLabel = Mage::helper('adminhtml')->__('Use Website');
+            $checkboxLabel = $this->__('Use Website');
         }
         elseif ($element->getCanUseDefaultValue()) {
             $addInheritCheckbox = true;
-            $checkboxLabel = Mage::helper('adminhtml')->__('Use Default');
+            $checkboxLabel = $this->__('Use Default');
         }
 
         if ($addInheritCheckbox) {
@@ -108,9 +108,16 @@ class Mage_Adminhtml_Block_System_Config_Form_Field
                         if (is_array($v['value']) && in_array($k, $v['value'])) {
                             $defTextArr[] = $v['label'];
                         }
-                    } elseif ($v['value']==$defText) {
-                        $defTextArr[] = $v['label'];
-                        break;
+                    } elseif (isset($v['value'])) {
+                        if ($v['value'] == $defText) {
+                            $defTextArr[] = $v['label'];
+                            break;
+                        }
+                    } elseif (!is_array($v)) {
+                        if ($k == $defText) {
+                            $defTextArr[] = $v;
+                            break;
+                        }
                     }
                 }
                 $defText = join(', ', $defTextArr);

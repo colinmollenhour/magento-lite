@@ -20,8 +20,8 @@
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
@@ -383,5 +383,18 @@ class Mage_Adminhtml_Controller_Action extends Mage_Core_Controller_Varien_Actio
             return false;
         }
         return true;
+    }
+
+    /**
+     * Validate password for current admin user
+     *
+     * @param string $password - current password
+     *
+     * @return mixed - returns true or array of errors
+     */
+    protected function _validateCurrentPassword($password)
+    {
+        $user = Mage::getSingleton('admin/session')->getUser();
+        return $user->validateCurrentPassword($password);
     }
 }

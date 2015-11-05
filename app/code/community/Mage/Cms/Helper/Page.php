@@ -10,17 +10,17 @@
  * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to license@magento.com so we can send you a copy immediately.
+ * to license@magentocommerce.com so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade Magento to newer
  * versions in the future. If you wish to customize Magento for your
- * needs please refer to http://www.magento.com for more information.
+ * needs please refer to http://www.magentocommerce.com for more information.
  *
  * @category    Mage
  * @package     Mage_Cms
- * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -62,8 +62,14 @@ class Mage_Cms_Helper_Page extends Mage_Core_Helper_Abstract
     */
     protected function _renderPage(Mage_Core_Controller_Varien_Action  $action, $pageId = null, $renderLayout = true)
     {
+
         $page = Mage::getSingleton('cms/page');
         if (!is_null($pageId) && $pageId!==$page->getId()) {
+            $delimeterPosition = strrpos($pageId, '|');
+            if ($delimeterPosition) {
+                $pageId = substr($pageId, 0, $delimeterPosition);
+            }
+
             $page->setStoreId(Mage::app()->getStore()->getId());
             if (!$page->load($pageId)) {
                 return false;
@@ -74,7 +80,8 @@ class Mage_Cms_Helper_Page extends Mage_Core_Helper_Abstract
             return false;
         }
 
-        $inRange = Mage::app()->getLocale()->isStoreDateInInterval(null, $page->getCustomThemeFrom(), $page->getCustomThemeTo());
+        $inRange = Mage::app()->getLocale()
+            ->isStoreDateInInterval(null, $page->getCustomThemeFrom(), $page->getCustomThemeTo());
 
         if ($page->getCustomTheme()) {
             if ($inRange) {
@@ -97,17 +104,18 @@ class Mage_Cms_Helper_Page extends Mage_Core_Helper_Abstract
             $action->getLayout()->helper('page/layout')->applyHandle($handle);
         }
 
-
         Mage::dispatchEvent('cms_page_render', array('page' => $page, 'controller_action' => $action));
 
         $action->loadLayoutUpdates();
-        $layoutUpdate = ($page->getCustomLayoutUpdateXml() && $inRange) ? $page->getCustomLayoutUpdateXml() : $page->getLayoutUpdateXml();
+        $layoutUpdate = ($page->getCustomLayoutUpdateXml() && $inRange)
+            ? $page->getCustomLayoutUpdateXml() : $page->getLayoutUpdateXml();
         $action->getLayout()->getUpdate()->addUpdate($layoutUpdate);
         $action->generateLayoutXml()->generateLayoutBlocks();
 
         $contentHeadingBlock = $action->getLayout()->getBlock('page_content_heading');
         if ($contentHeadingBlock) {
-            $contentHeadingBlock->setContentHeading($page->getContentHeading());
+            $contentHeading = $this->escapeHtml($page->getContentHeading());
+            $contentHeadingBlock->setContentHeading($contentHeading);
         }
 
         if ($page->getRootTemplate()) {
@@ -115,11 +123,14 @@ class Mage_Cms_Helper_Page extends Mage_Core_Helper_Abstract
                 ->applyTemplate($page->getRootTemplate());
         }
 
-        //foreach (array('catalog/session', 'checkout/session') as $class_name) {
-        foreach (array('core/session') as $class_name) {
-            $storage = Mage::getSingleton($class_name);
+        /* @TODO: Move catalog and checkout storage types to appropriate modules */
+        $messageBlock = $action->getLayout()->getMessagesBlock();
+        //foreach (array('catalog/session', 'checkout/session', 'customer/session') as $storageType) {
+        foreach (array() as $storageType) {
+            $storage = Mage::getSingleton($storageType);
             if ($storage) {
-                $action->getLayout()->getMessagesBlock()->addMessages($storage->getMessages(true));
+                $messageBlock->addStorageType($storageType);
+                $messageBlock->addMessages($storage->getMessages(true));
             }
         }
 

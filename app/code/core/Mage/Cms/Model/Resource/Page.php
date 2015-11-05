@@ -20,8 +20,8 @@
  *
  * @category    Mage
  * @package     Mage_Cms
- * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 
@@ -146,6 +146,9 @@ class Mage_Cms_Model_Resource_Page extends Mage_Core_Model_Resource_Db_Abstract
 
             $this->_getWriteAdapter()->insertMultiple($table, $data);
         }
+
+        //Mark layout cache as invalidated
+        Mage::app()->getCacheInstance()->invalidateType('layout');
 
         return parent::_afterSave($object);
     }

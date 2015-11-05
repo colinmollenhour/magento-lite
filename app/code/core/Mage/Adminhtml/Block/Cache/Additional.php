@@ -20,8 +20,8 @@
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 class Mage_Adminhtml_Block_Cache_Additional extends Mage_Adminhtml_Block_Template
@@ -29,6 +29,11 @@ class Mage_Adminhtml_Block_Cache_Additional extends Mage_Adminhtml_Block_Templat
     public function getCleanImagesUrl()
     {
         return $this->getUrl('*/*/cleanImages');
+    }
+
+    public function getCleanSwatchesUrl()
+    {
+        return $this->getUrl('*/*/cleanSwatches');
     }
 
     public function getCleanMediaUrl()
