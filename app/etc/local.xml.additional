@@ -80,5 +80,9 @@ to app/etc/local.xml manually.
             <header1>HTTP_X_REAL_IP</header1>
             <header2>HTTP_X_FORWARDED_FOR</header2>
         </remote_addr_headers>
+
+        <!-- example of redis session storage -->
+        <session_save><![CDATA[redis]]></session_save>
+        <session_save_path><![CDATA[tcp://127.0.0.1:6379?weight=2&timeout=2.5]]></session_save_path>
     </global>
 </config>

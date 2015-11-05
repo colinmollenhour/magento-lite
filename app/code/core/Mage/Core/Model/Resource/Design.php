@@ -10,17 +10,17 @@
  * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to license@magentocommerce.com so we can send you a copy immediately.
+ * to license@magento.com so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade Magento to newer
  * versions in the future. If you wish to customize Magento for your
- * needs please refer to http://www.magentocommerce.com for more information.
+ * needs please refer to http://www.magento.com for more information.
  *
  * @category    Mage
  * @package     Mage_Core
- * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
  * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -52,22 +52,27 @@ class Mage_Core_Model_Resource_Design extends Mage_Core_Model_Resource_Db_Abstra
      */
     public function _beforeSave(Mage_Core_Model_Abstract $object)
     {
-        $dateFrom = $object->getDateFrom();
-        $dateTo = $object->getDateTo();
-        if (!empty($dateFrom) && !empty($dateTo)) {
-            $validator = new Zend_Validate_Date();
-            if (!$validator->isValid($dateFrom) || !$validator->isValid($dateTo)) {
-                Mage::throwException(Mage::helper('core')->__('Invalid date'));
-            }
-            if (Varien_Date::toTimestamp($dateFrom) > Varien_Date::toTimestamp($dateTo)) {
-                Mage::throwException(Mage::helper('core')->__('Start date cannot be greater than end date.'));
-            }
+        if ($date = $object->getDateFrom()) {
+            $object->setDateFrom($this->formatDate($date));
+        } else {
+            $object->setDateFrom(null);
+        }
+
+        if ($date = $object->getDateTo()) {
+            $object->setDateTo($this->formatDate($date));
+        } else {
+            $object->setDateTo(null);
+        }
+
+        if (!is_null($object->getDateFrom()) && !is_null($object->getDateTo())
+                && Varien_Date::toTimestamp($object->getDateFrom()) > Varien_Date::toTimestamp($object->getDateTo())) {
+            Mage::throwException(Mage::helper('core')->__('Start date cannot be greater than end date.'));
         }
 
         $check = $this->_checkIntersection(
             $object->getStoreId(),
-            $dateFrom,
-            $dateTo,
+            $object->getDateFrom(),
+            $object->getDateTo(),
             $object->getId()
         );
 
@@ -75,6 +80,11 @@ class Mage_Core_Model_Resource_Design extends Mage_Core_Model_Resource_Db_Abstra
             Mage::throwException(
                 Mage::helper('core')->__('Your design change for the specified store intersects with another one, please specify another date range.'));
         }
+
+        if ($object->getDateFrom() === null)
+            $object->setDateFrom(new Zend_Db_Expr('null'));
+        if ($object->getDateTo() === null)
+            $object->setDateTo(new Zend_Db_Expr('null'));
 
         parent::_beforeSave($object);
     }
@@ -99,7 +109,7 @@ class Mage_Core_Model_Resource_Design extends Mage_Core_Model_Resource_Db_Abstra
 
         $dateConditions = array('date_to IS NULL AND date_from IS NULL');
 
-        if (!empty($dateFrom)) {
+        if (!is_null($dateFrom)) {
             $dateConditions[] = ':date_from BETWEEN date_from AND date_to';
             $dateConditions[] = ':date_from >= date_from and date_to IS NULL';
             $dateConditions[] = ':date_from <= date_to and date_from IS NULL';
@@ -107,7 +117,7 @@ class Mage_Core_Model_Resource_Design extends Mage_Core_Model_Resource_Db_Abstra
             $dateConditions[] = 'date_from IS NULL';
         }
 
-        if (!empty($dateTo)) {
+        if (!is_null($dateTo)) {
             $dateConditions[] = ':date_to BETWEEN date_from AND date_to';
             $dateConditions[] = ':date_to >= date_from AND date_to IS NULL';
             $dateConditions[] = ':date_to <= date_to AND date_from IS NULL';
@@ -115,18 +125,18 @@ class Mage_Core_Model_Resource_Design extends Mage_Core_Model_Resource_Db_Abstra
             $dateConditions[] = 'date_to IS NULL';
         }
 
-        if (empty($dateFrom) && !empty($dateTo)) {
+        if (is_null($dateFrom) && !is_null($dateTo)) {
             $dateConditions[] = 'date_to <= :date_to OR date_from <= :date_to';
         }
 
-        if (!empty($dateFrom) && empty($dateTo)) {
+        if (!is_null($dateFrom) && is_null($dateTo)) {
             $dateConditions[] = 'date_to >= :date_from OR date_from >= :date_from';
         }
 
-        if (!empty($dateFrom) && !empty($dateTo)) {
+        if (!is_null($dateFrom) && !is_null($dateTo)) {
             $dateConditions[] = 'date_from BETWEEN :date_from AND :date_to';
             $dateConditions[] = 'date_to BETWEEN :date_from AND :date_to';
-        } elseif (empty($dateFrom) && empty($dateTo)) {
+        } elseif (is_null($dateFrom) && is_null($dateTo)) {
             $dateConditions = array();
         }
 
@@ -141,10 +151,10 @@ class Mage_Core_Model_Resource_Design extends Mage_Core_Model_Resource_Db_Abstra
             'current_id' => (int)$currentId,
         );
 
-        if (!empty($dateTo)) {
+        if (!is_null($dateTo)) {
             $bind['date_to'] = $dateTo;
         }
-        if (!empty($dateFrom)) {
+        if (!is_null($dateFrom)) {
             $bind['date_from'] = $dateFrom;
         }
 

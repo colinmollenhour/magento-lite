@@ -199,13 +199,9 @@ class Varien_Http_Adapter_Curl implements Zend_Http_Client_Adapter_Interface
         $response = curl_exec($this->_getResource());
 
         // Remove 100 and 101 responses headers
-        while (Zend_Http_Response::extractCode($response) == 100 || Zend_Http_Response::extractCode($response) == 101) {
+        if (Zend_Http_Response::extractCode($response) == 100 || Zend_Http_Response::extractCode($response) == 101) {
             $response = preg_split('/^\r?$/m', $response, 2);
             $response = trim($response[1]);
-        }
-
-        if (stripos($response, "Transfer-Encoding: chunked\r\n")) {
-            $response = str_ireplace("Transfer-Encoding: chunked\r\n", '', $response);
         }
 
         return $response;
