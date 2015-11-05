@@ -20,8 +20,8 @@
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright   Copyright (c) 2006-2014 X.commerce, Inc. (http://www.magento.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
@@ -34,6 +34,15 @@
 class Mage_Adminhtml_Block_Permissions_Tab_Rolesedit extends Mage_Adminhtml_Block_Widget_Form
     implements Mage_Adminhtml_Block_Widget_Tab_Interface
 {
+    /**
+     * Retrieve an instance of the fallback helper
+     * @return Mage_Admin_Helper_Rules_Fallback
+     */
+    protected function _getFallbackHelper()
+    {
+        return Mage::helper('admin/rules_fallback');
+    }
+
     /**
      * Get tab label
      *
@@ -90,13 +99,30 @@ class Mage_Adminhtml_Block_Permissions_Tab_Rolesedit extends Mage_Adminhtml_Bloc
 
         $selrids = array();
 
+        /** @var $item Mage_Admin_Model_Rules */
         foreach ($rules_set->getItems() as $item) {
             $itemResourceId = $item->getResource_id();
-            if (array_key_exists(strtolower($itemResourceId), $resources) && $item->getPermission() == 'allow') {
-                $resources[$itemResourceId]['checked'] = true;
-                array_push($selrids, $itemResourceId);
+            if (array_key_exists(strtolower($itemResourceId), $resources)) {
+                if ($item->isAllowed()) {
+                    $resources[$itemResourceId]['checked'] = true;
+                    array_push($selrids, $itemResourceId);
+                }
             }
         }
+
+        $resourcesPermissionsMap = $rules_set->getResourcesPermissionsArray();
+        $undefinedResources = array_diff(array_keys($resources), array_keys($resourcesPermissionsMap));
+
+        foreach ($undefinedResources as $undefinedResourceId) {
+            if ($this->_getFallbackHelper()->fallbackResourcePermissions(
+                    $resourcesPermissionsMap,
+                    $undefinedResourceId
+                ) == Mage_Admin_Model_Rules::RULE_PERMISSION_ALLOWED
+            ) {
+                array_push($selrids, $undefinedResourceId);
+            }
+        }
+
 
         $this->setSelectedResources($selrids);
 
