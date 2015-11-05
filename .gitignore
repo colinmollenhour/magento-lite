@@ -5,9 +5,11 @@ app/etc/modules/*.xml
 app/design/frontend/*
 !app/design/frontend/base
 !app/design/frontend/default
+!app/design/frontend/rwd
 skin/frontend/*
 !skin/frontend/base
 !skin/frontend/default
+!skin/frontend/rwd
 .modman
 .htaccess
 .idea
