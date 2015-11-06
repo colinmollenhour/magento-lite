@@ -10,18 +10,18 @@
  * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to license@magentocommerce.com so we can send you a copy immediately.
+ * to license@magento.com so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade Magento to newer
  * versions in the future. If you wish to customize Magento for your
- * needs please refer to http://www.magentocommerce.com for more information.
+ * needs please refer to http://www.magento.com for more information.
  *
  * @category    Mage
  * @package     Mage_Admin
- * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
@@ -48,22 +48,64 @@
  */
 class Mage_Admin_Model_Rules extends Mage_Core_Model_Abstract
 {
+    /**
+     * Allowed permission code
+     */
+    const RULE_PERMISSION_ALLOWED = 'allow';
+
+    /**
+     * Denied permission code
+     */
+    const RULE_PERMISSION_DENIED = 'deny';
+
     protected function _construct()
     {
         $this->_init('admin/rules');
     }
 
-    public function update() {
+    /**
+     * Update rules
+     * @return $this
+     */
+    public function update()
+    {
         $this->getResource()->update($this);
         return $this;
     }
 
-    public function getCollection() {
+    /**
+     * Initialize and retrieve permissions collection
+     * @return Object
+     */
+    public function getCollection()
+    {
         return Mage::getResourceModel('admin/permissions_collection');
     }
 
-    public function saveRel() {
+    /**
+     * Save rules relations to the database
+     * @return $this
+     */
+    public function saveRel()
+    {
         $this->getResource()->saveRel($this);
         return $this;
+    }
+
+    /**
+     * Check if the current rule is allowed
+     * @return bool
+     */
+    public function isAllowed()
+    {
+        return $this->getPermission() == self::RULE_PERMISSION_ALLOWED;
+    }
+
+    /**
+     * Check if the current rule is denied
+     */
+    public function isDenied()
+    {
+        return $this->getPermission() == self::RULE_PERMISSION_DENIED;
     }
 }

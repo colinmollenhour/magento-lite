@@ -10,17 +10,17 @@
  * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to license@magentocommerce.com so we can send you a copy immediately.
+ * to license@magento.com so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade Magento to newer
  * versions in the future. If you wish to customize Magento for your
- * needs please refer to http://www.magentocommerce.com for more information.
+ * needs please refer to http://www.magento.com for more information.
  *
- * @category   Varien
- * @package    Varien_Crypt
- * @copyright  Copyright (c) 2008 Irubin Consulting Inc. DBA Varien (http://www.varien.com)
+ * @category    Varien
+ * @package     Varien_Crypt
+ * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -41,7 +41,18 @@ class Varien_Crypt_Mcrypt extends Varien_Crypt_Abstract
      */
     public function __construct(array $data=array())
     {
+        register_shutdown_function(array($this, 'destruct'));
         parent::__construct($data);
+    }
+
+    /**
+     * Close mcrypt module on shutdown
+     */
+    public function destruct()
+    {
+        if ($this->getHandler()) {
+            $this->_reset();
+        }
     }
 
     /**
@@ -117,17 +128,6 @@ class Varien_Crypt_Mcrypt extends Varien_Crypt_Abstract
             return $data;
         }
         return mdecrypt_generic($this->getHandler(), $data);
-    }
-
-    /**
-     * Desctruct cipher module
-     *
-     */
-    public function __destruct()
-    {
-        if ($this->getHandler()) {
-            $this->_reset();
-        }
     }
 
     protected function _reset()

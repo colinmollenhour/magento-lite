@@ -10,17 +10,17 @@
  * http://opensource.org/licenses/afl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to license@magentocommerce.com so we can send you a copy immediately.
+ * to license@magento.com so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade Magento to newer
  * versions in the future. If you wish to customize Magento for your
- * needs please refer to http://www.magentocommerce.com for more information.
+ * needs please refer to http://www.magento.com for more information.
  *
  * @category    design
  * @package     default_default
- * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
  * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
@@ -44,7 +44,7 @@ function startInstall(state)
 
 function installSuccess()
 {
-    alert("<?php echo $this->__("All packages were installed, click 'OK' to continue with installation.") ?>");
+    alert('<?php echo Mage::helper('core')->jsQuoteEscape($this->__("All packages were installed, click 'OK' to continue with installation.")) ?>');
     location.href = "<?php echo $this->getNextUrl() ?>";
     $$('button').each(function(el) {
         el.disabled = true;
@@ -54,7 +54,7 @@ function installSuccess()
 
 function installFailure()
 {
-    alert("<?php echo $this->__("There was a problem installing Magento packages. Please read the log, correct errors and try again.") ?>\n<?php echo $this->__("Alternatively you could try the 'Manual Downloads and Upgrades' method.") ?>");
+    alert('<?php echo Mage::helper('core')->jsQuoteEscape($this->__("There was a problem installing Magento packages. Please read the log, correct errors and try again.")) ?>\n<?php echo Mage::helper('core')->jsQuoteEscape($this->__("Alternatively you could try the 'Manual Downloads and Upgrades' method.")) ?>');
     $$('button').each(function(el) {
         el.disabled = true;
         el.removeClassName('disabled');
@@ -65,7 +65,7 @@ function installFailure()
 <div class="page-head">
     <h3><?php echo $this->__('Download Magento Core Modules and Updates') ?></h3>
 </div>
-<?php echo $this->getMessagesBlock()->getGroupedHtml() ?>
+<?php echo $this->getMessagesBlock()->toHtml() ?>
 
 <form action="<?php echo $this->getPostUrl() ?>" method="post" id="form-validate">
 <input type="hidden" id="continue" name="continue" value="svn" />

@@ -10,18 +10,18 @@
  * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to license@magentocommerce.com so we can send you a copy immediately.
+ * to license@magento.com so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade Magento to newer
  * versions in the future. If you wish to customize Magento for your
- * needs please refer to http://www.magentocommerce.com for more information.
+ * needs please refer to http://www.magento.com for more information.
  *
  * @category    Mage
  * @package     Mage_Adminhtml
- * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
@@ -154,7 +154,7 @@ class Mage_Adminhtml_Permissions_RoleController extends Mage_Adminhtml_Controlle
             Mage::getSingleton('adminhtml/session')->addError($this->__('An error occurred while deleting this role.'));
         }
 
-        $this->_redirect("*/*/");
+        $this->_redirect('*/*/');
     }
 
     /**
@@ -175,12 +175,25 @@ class Mage_Adminhtml_Permissions_RoleController extends Mage_Adminhtml_Controlle
 
         $isAll = $this->getRequest()->getParam('all');
         if ($isAll)
-            $resource = array("all");
+            $resource = array('all');
 
         $role = $this->_initRole('role_id');
         if (!$role->getId() && $rid) {
             Mage::getSingleton('adminhtml/session')->addError($this->__('This Role no longer exists.'));
             $this->_redirect('*/*/');
+            return;
+        }
+
+        //Validate current admin password
+        $currentPassword = $this->getRequest()->getParam('current_password', null);
+        $this->getRequest()->setParam('current_password', null);
+        $result = $this->_validateCurrentPassword($currentPassword);
+
+        if (is_array($result)) {
+            foreach ($result as $error) {
+                $this->_getSession()->addError($error);
+            }
+            $this->_redirect('*/*/editrole', array('rid' => $rid));
             return;
         }
 
@@ -196,7 +209,7 @@ class Mage_Adminhtml_Permissions_RoleController extends Mage_Adminhtml_Controlle
             );
             $role->save();
 
-            Mage::getModel("admin/rules")
+            Mage::getModel('admin/rules')
                 ->setRoleId($role->getId())
                 ->setResources($resource)
                 ->saveRel();
@@ -243,7 +256,7 @@ class Mage_Adminhtml_Permissions_RoleController extends Mage_Adminhtml_Controlle
     protected function _deleteUserFromRole($userId, $roleId)
     {
         try {
-            Mage::getModel("admin/user")
+            Mage::getModel('admin/user')
                 ->setRoleId($roleId)
                 ->setUserId($userId)
                 ->deleteFromRole();
@@ -263,7 +276,7 @@ class Mage_Adminhtml_Permissions_RoleController extends Mage_Adminhtml_Controlle
      */
     protected function _addUserToRole($userId, $roleId)
     {
-        $user = Mage::getModel("admin/user")->load($userId);
+        $user = Mage::getModel('admin/user')->load($userId);
         $user->setRoleId($roleId)->setUserId($userId);
 
         if( $user->roleUserExists() === true ) {
@@ -282,5 +295,46 @@ class Mage_Adminhtml_Permissions_RoleController extends Mage_Adminhtml_Controlle
     protected function _isAllowed()
     {
         return Mage::getSingleton('admin/session')->isAllowed('system/acl/roles');
+    }
+
+    /**
+     * Action to refresh role-rule relations.
+     * This method will make sure the rendered ACL resource tree checkboxes match the actual ACL permissions.
+     * To be used after adding a new ACL resource via config
+     */
+    public function refreshRolesAction()
+    {
+        $resourceAcl = Mage::getResourceModel('admin/acl')->loadAcl();
+        $roles = Mage::getResourceModel('admin/role_collection')->setRolesFilter()->getItems();
+        try {
+            foreach ($roles as $role) {
+                $roleTypeId = $role->getRoleType() . $role->getRoleId();
+                $selectedResourceIds = array();
+                if ($resourceAcl->isAllowed($roleTypeId, 'all')) {
+                    $selectedResourceIds = array('all');
+                } else {
+                    foreach ($resourceAcl->getResources() as $resource) {
+                        if ($resourceAcl->isAllowed($roleTypeId, $resource)) {
+                            array_push($selectedResourceIds, $resource);
+                        }
+                    }
+                }
+
+                Mage::getModel('admin/rules')
+                    ->setRoleId($role->getId())
+                    ->setResources($selectedResourceIds)
+                    ->saveRel();
+            }
+
+            Mage::getSingleton('adminhtml/session')->addSuccess($this->__('The roles have been refreshed.'));
+        } catch (Mage_Core_Exception $e) {
+            Mage::getSingleton('adminhtml/session')->addError($e->getMessage());
+        } catch (Exception $e) {
+            Mage::logException($e);
+            Mage::getSingleton('adminhtml/session')->addError($this->__('An error occurred while refreshing roles.'));
+        }
+
+        $this->_redirect('*/*/');
+        return;
     }
 }

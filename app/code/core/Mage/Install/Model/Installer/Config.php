@@ -10,18 +10,18 @@
  * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to license@magentocommerce.com so we can send you a copy immediately.
+ * to license@magento.com so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade Magento to newer
  * versions in the future. If you wish to customize Magento for your
- * needs please refer to http://www.magentocommerce.com for more information.
+ * needs please refer to http://www.magento.com for more information.
  *
  * @category    Mage
  * @package     Mage_Install
- * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 
@@ -110,15 +110,10 @@ class Mage_Install_Model_Installer_Config extends Mage_Install_Model_Installer_A
 
     public function getFormData()
     {
-        $uri = Zend_Uri::factory(Mage::getBaseUrl('web'));
-
-        $baseUrl = $uri->getUri();
-        if ($uri->getScheme() !== 'https') {
-            $uri->setPort(null);
-            $baseSecureUrl = str_replace('http://', 'https://', $uri->getUri());
-        } else {
-            $baseSecureUrl = $uri->getUri();
-        }
+        $baseUrl = Mage::helper('core/url')->decodePunycode(Mage::getBaseUrl('web'));
+        $uri    = explode(':', $baseUrl, 2);
+        $scheme = strtolower($uri[0]);
+        $baseSecureUrl = ($scheme !== 'https') ? str_replace('http://', 'https://', $baseUrl) : $baseUrl;
 
         $connectDefault = Mage::getConfig()
                 ->getResourceConnectionConfig(Mage_Core_Model_Resource::DEFAULT_SETUP_RESOURCE);

@@ -10,18 +10,18 @@
  * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to license@magentocommerce.com so we can send you a copy immediately.
+ * to license@magento.com so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade Magento to newer
  * versions in the future. If you wish to customize Magento for your
- * needs please refer to http://www.magentocommerce.com for more information.
+ * needs please refer to http://www.magento.com for more information.
  *
  * @category    Mage
  * @package     Mage_Backup
- * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 
@@ -130,16 +130,19 @@ class Mage_Backup_Model_Db
                 $backup->write($this->getResource()->getTableDataBeforeSql($table));
 
                 if ($tableStatus->getDataLength() > self::BUFFER_LENGTH) {
-                    if ($tableStatus->getAvgRowLength() < self::BUFFER_LENGTH) {
+                    if ($tableStatus->getAvgRowLength() > 0 && $tableStatus->getAvgRowLength() < self::BUFFER_LENGTH) {
+                        // Process rows in batches
                         $limit = floor(self::BUFFER_LENGTH / $tableStatus->getAvgRowLength());
                         $multiRowsLength = ceil($tableStatus->getRows() / $limit);
                     }
                     else {
+                        // Process rows one by one
                         $limit = 1;
                         $multiRowsLength = $tableStatus->getRows();
                     }
                 }
                 else {
+                    // Process all rows at once
                     $limit = $tableStatus->getRows();
                     $multiRowsLength = 1;
                 }

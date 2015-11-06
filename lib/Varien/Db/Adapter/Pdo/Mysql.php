@@ -10,17 +10,17 @@
  * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to license@magentocommerce.com so we can send you a copy immediately.
+ * to license@magento.com so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade Magento to newer
  * versions in the future. If you wish to customize Magento for your
- * needs please refer to http://www.magentocommerce.com for more information.
+ * needs please refer to http://www.magento.com for more information.
  *
- * @category   Varien
- * @package    Varien_Db
- * @copyright  Copyright (c) 2008 Irubin Consulting Inc. DBA Varien (http://www.varien.com)
+ * @category    Varien
+ * @package     Varien_Db
+ * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -47,6 +47,14 @@ class Varien_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Mysql implements V
     const LENGTH_TABLE_NAME     = 64;
     const LENGTH_INDEX_NAME     = 64;
     const LENGTH_FOREIGN_NAME   = 64;
+
+    /**
+     * Those constants are defining the possible address types
+     */
+    const ADDRESS_TYPE_HOSTNAME     = 'hostname';
+    const ADDRESS_TYPE_UNIX_SOCKET  = 'unix_socket';
+    const ADDRESS_TYPE_IPV4_ADDRESS = 'ipv4';
+    const ADDRESS_TYPE_IPV6_ADDRESS = 'ipv6';
 
     /**
      * MEMORY engine type for MySQL tables
@@ -295,6 +303,61 @@ class Varien_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Mysql implements V
     }
 
     /**
+     * Parse a source hostname and generate a host info
+     * @param $hostName
+     *
+     * @return Varien_Object
+     */
+    protected function _getHostInfo($hostName)
+    {
+        $hostInfo = new Varien_Object();
+        $matches = array();
+        if (strpos($hostName, '/') !== false) {
+            $hostInfo->setAddressType(self::ADDRESS_TYPE_UNIX_SOCKET)
+                ->setUnixSocket($hostName);
+        } elseif (
+            preg_match(
+                '/^\[(([0-9a-f]{1,4})?(:([0-9a-f]{1,4})?){1,}:([0-9a-f]{1,4}))(%[0-9a-z]+)?\](:([0-9]+))?$/i',
+                $hostName,
+                $matches
+            )
+        ) {
+            $hostName = isset($matches[1]) ? $matches[1] : null;
+            !is_null($hostName) && isset($matches[6]) && ($hostName .= $matches[6]);
+            $hostInfo->setAddressType(self::ADDRESS_TYPE_IPV6_ADDRESS)
+                ->setHostName($hostName)
+                ->setPort(isset($matches[8]) ? $matches[8] : null);
+        } elseif (
+            preg_match(
+                '/^(([0-9a-f]{1,4})?(:([0-9a-f]{1,4})?){1,}:([0-9a-f]{1,4}))(%[0-9a-z]+)?$/i',
+                $hostName,
+                $matches
+            )
+        ) {
+            $hostName = isset($matches[1]) ? $matches[1] : null;
+            !is_null($hostName) && isset($matches[6]) && ($hostName .= $matches[6]);
+            $hostInfo->setAddressType(self::ADDRESS_TYPE_IPV6_ADDRESS)
+                ->setHostName($hostName);
+        } elseif (strpos($hostName, ':') !== false) {
+            list($hostAddress, $hostPort) = explode(':', $hostName);
+            $hostInfo->setAddressType(
+                filter_var($hostAddress, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)
+                    ? self::ADDRESS_TYPE_IPV4_ADDRESS
+                    : self::ADDRESS_TYPE_HOSTNAME
+            )->setHostName($hostAddress)
+                ->setPort($hostPort);
+        } else {
+            $hostInfo->setAddressType(
+                filter_var($hostName, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)
+                    ? self::ADDRESS_TYPE_IPV4_ADDRESS
+                    : self::ADDRESS_TYPE_HOSTNAME
+            )->setHostName($hostName);
+        }
+
+        return $hostInfo;
+    }
+
+    /**
      * Creates a PDO object and connects to the database.
      *
      * @throws Zend_Db_Adapter_Exception
@@ -309,11 +372,24 @@ class Varien_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Mysql implements V
             throw new Zend_Db_Adapter_Exception('pdo_mysql extension is not installed');
         }
 
-        if (strpos($this->_config['host'], '/') !== false) {
-            $this->_config['unix_socket'] = $this->_config['host'];
-            unset($this->_config['host']);
-        } else if (strpos($this->_config['host'], ':') !== false) {
-            list($this->_config['host'], $this->_config['port']) = explode(':', $this->_config['host']);
+
+        $hostInfo = $this->_getHostInfo($this->_config['host']);
+
+        switch ($hostInfo->getAddressType()) {
+            case self::ADDRESS_TYPE_UNIX_SOCKET:
+                $this->_config['unix_socket'] = $hostInfo->getUnixSocket();
+                unset($this->_config['host']);
+                break;
+            case self::ADDRESS_TYPE_IPV6_ADDRESS: // break intentionally omitted
+            case self::ADDRESS_TYPE_IPV4_ADDRESS: // break intentionally omitted
+            case self::ADDRESS_TYPE_HOSTNAME:
+                $this->_config['host'] = $hostInfo->getHostName();
+                if ($hostInfo->getPort()) {
+                    $this->_config['port'] = $hostInfo->getPort();
+                }
+                break;
+            default:
+                break;
         }
 
         $this->_debugTimer();
@@ -1561,6 +1637,23 @@ class Varien_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Mysql implements V
     }
 
     /**
+     * Decorate a table info by detecting and parsing the binary/varbinary fields
+     * @param $tableColumnInfo
+     *
+     * @return mixed
+     */
+    public function decorateTableInfo($tableColumnInfo)
+    {
+        $matches = array();
+        if (preg_match('/^((?:var)?binary)\((\d+)\)/', $tableColumnInfo['DATA_TYPE'], $matches)) {
+            list ($fieldFullDescription, $fieldType, $fieldLength) = $matches;
+            $tableColumnInfo['DATA_TYPE'] = $fieldType;
+            $tableColumnInfo['LENGTH'] = $fieldLength;
+        }
+        return $tableColumnInfo;
+    }
+
+    /**
      * Returns the column descriptions for a table.
      *
      * The return value is an associative array keyed by the column name,
@@ -1593,7 +1686,13 @@ class Varien_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Mysql implements V
         $cacheKey = $this->_getTableName($tableName, $schemaName);
         $ddl = $this->loadDdlCache($cacheKey, self::DDL_DESCRIBE);
         if ($ddl === false) {
-            $ddl = parent::describeTable($tableName, $schemaName);
+            $ddl = array_map(
+                array(
+                     $this,
+                     'decorateTableInfo'
+                ),
+                parent::describeTable($tableName, $schemaName)
+            );
             /**
              * Remove bug in some MySQL versions, when int-column without default value is described as:
              * having default empty string value
@@ -1786,6 +1885,9 @@ class Varien_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Mysql implements V
             case 'decimal':
             case 'numeric':
                 return Varien_Db_Ddl_Table::TYPE_DECIMAL;
+            case 'varbinary':
+                return Varien_Db_Ddl_Table::TYPE_VARBINARY;
+                break;
         }
     }
 
@@ -2834,10 +2936,6 @@ class Varien_Db_Adapter_Pdo_Mysql extends Zend_Db_Adapter_Pdo_Mysql implements V
 
         $query = '';
         if (is_array($condition)) {
-            if (isset($condition['field_expr'])) {
-                $fieldName = str_replace('#?', $this->quoteIdentifier($fieldName), $condition['field_expr']);
-                unset($condition['field_expr']);
-            }
             $key = key(array_intersect_key($condition, $conditionKeyMap));
 
             if (isset($condition['from']) || isset($condition['to'])) {

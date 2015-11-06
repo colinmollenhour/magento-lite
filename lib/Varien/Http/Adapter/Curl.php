@@ -10,17 +10,17 @@
  * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to license@magentocommerce.com so we can send you a copy immediately.
+ * to license@magento.com so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade Magento to newer
  * versions in the future. If you wish to customize Magento for your
- * needs please refer to http://www.magentocommerce.com for more information.
+ * needs please refer to http://www.magento.com for more information.
  *
- * @category   Varien
- * @package    Varien_Http
- * @copyright  Copyright (c) 2008 Irubin Consulting Inc. DBA Varien (http://www.varien.com)
+ * @category    Varien
+ * @package     Varien_Http
+ * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -53,11 +53,11 @@ class Varien_Http_Adapter_Curl implements Zend_Http_Client_Adapter_Interface
      * @var array
      */
     protected $_allowedParams = array(
-        'timeout' => CURLOPT_TIMEOUT,
-        'maxredirects' => CURLOPT_MAXREDIRS,
-        'proxy' => CURLOPT_PROXY,
-        'ssl_cert' => CURLOPT_SSLCERT,
-        'userpwd' => CURLOPT_USERPWD
+        'timeout'       => CURLOPT_TIMEOUT,
+        'maxredirects'  => CURLOPT_MAXREDIRS,
+        'proxy'         => CURLOPT_PROXY,
+        'ssl_cert'      => CURLOPT_SSLCERT,
+        'userpwd'       => CURLOPT_USERPWD
     );
 
     /**
@@ -74,13 +74,10 @@ class Varien_Http_Adapter_Curl implements Zend_Http_Client_Adapter_Interface
      */
     protected function _applyConfig()
     {
+        curl_setopt_array($this->_getResource(), $this->_options);
+
         if (empty($this->_config)) {
             return $this;
-        }
-
-        // apply additional options to cURL
-        foreach ($this->_options as $option => $value) {
-            curl_setopt($this->_getResource(), $option, $value);
         }
 
         $verifyPeer = isset($this->_config['verifypeer']) ? $this->_config['verifypeer'] : 0;
@@ -123,6 +120,19 @@ class Varien_Http_Adapter_Curl implements Zend_Http_Client_Adapter_Interface
     }
 
     /**
+     * Add additional options list to curl
+     *
+     * @param array $options
+     *
+     * @return Varien_Http_Adapter_Curl
+     */
+    public function addOptions(array $options)
+    {
+        $this->_options = $options + $this->_options;
+        return $this;
+    }
+
+    /**
      * Set the configuration array for the adapter
      *
      * @param array $config
@@ -152,7 +162,7 @@ class Varien_Http_Adapter_Curl implements Zend_Http_Client_Adapter_Interface
      * Send request to the remote server
      *
      * @param string        $method
-     * @param Zend_Uri_Http $url
+     * @param string|Zend_Uri_Http $url
      * @param string        $http_ver
      * @param array         $headers
      * @param string        $body
@@ -165,26 +175,23 @@ class Varien_Http_Adapter_Curl implements Zend_Http_Client_Adapter_Interface
         }
         $this->_applyConfig();
 
-        // set url to post to
-        curl_setopt($this->_getResource(), CURLOPT_URL, $url);
-        curl_setopt($this->_getResource(), CURLOPT_RETURNTRANSFER, true);
-        if ($method == Zend_Http_Client::POST) {
-            curl_setopt($this->_getResource(), CURLOPT_POST, true);
-            curl_setopt($this->_getResource(), CURLOPT_POSTFIELDS, $body);
-        }
-        elseif ($method == Zend_Http_Client::GET) {
-            curl_setopt($this->_getResource(), CURLOPT_HTTPGET, true);
-        }
-
-        if (is_array($headers)) {
-            curl_setopt($this->_getResource(), CURLOPT_HTTPHEADER, $headers);
-        }
-
-        /**
-         * @internal Curl options setter have to be re-factored
-         */
         $header = isset($this->_config['header']) ? $this->_config['header'] : true;
-        curl_setopt($this->_getResource(), CURLOPT_HEADER, $header);
+        $options = array(
+            CURLOPT_URL                     => $url,
+            CURLOPT_RETURNTRANSFER          => true,
+            CURLOPT_HEADER                  => $header
+        );
+        if ($method == Zend_Http_Client::POST) {
+            $options[CURLOPT_POST]          = true;
+            $options[CURLOPT_POSTFIELDS]    = $body;
+        } elseif ($method == Zend_Http_Client::GET) {
+            $options[CURLOPT_HTTPGET]       = true;
+        }
+        if (is_array($headers)) {
+            $options[CURLOPT_HTTPHEADER]    = $headers;
+        }
+
+        curl_setopt_array($this->_getResource(), $options);
 
         return $body;
     }
@@ -264,6 +271,10 @@ class Varien_Http_Adapter_Curl implements Zend_Http_Client_Adapter_Interface
      */
     public function getInfo($opt = 0)
     {
+        if (!$opt) {
+            return curl_getinfo($this->_getResource());
+        }
+
         return curl_getinfo($this->_getResource(), $opt);
     }
 

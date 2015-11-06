@@ -10,17 +10,17 @@
  * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to license@magentocommerce.com so we can send you a copy immediately.
+ * to license@magento.com so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade Magento to newer
  * versions in the future. If you wish to customize Magento for your
- * needs please refer to http://www.magentocommerce.com for more information.
+ * needs please refer to http://www.magento.com for more information.
  *
- * @category   Varien
- * @package    Varien_File
- * @copyright  Copyright (c) 2008 Irubin Consulting Inc. DBA Varien (http://www.varien.com)
+ * @category    Varien
+ * @package     Varien_File
+ * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
  * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
@@ -37,7 +37,16 @@ class Varien_File_Uploader_Image extends Varien_File_Uploader
 
     function __construct($file=null)
     {
+        register_shutdown_function(array($this, 'destruct'));
         $this->newUploader($file);
+    }
+
+    /**
+     * Uploader clean on shutdown
+     */
+    public function destruct()
+    {
+        $this->uploader->Clean();
     }
 
     /**
@@ -148,7 +157,7 @@ class Varien_File_Uploader_Image extends Varien_File_Uploader
      * $absoluteY sets the twatermark absolute Y position within the image
      *
      * Value is in pixels, representing the distance between the left of the image and the watermark
-     * If a negative value is used, it will represent the distance between the right of the image and the watermark    
+     * If a negative value is used, it will represent the distance between the right of the image and the watermark
      *
      */
     public function addWatermark($fileName=null, $position="BL", $absoluteX=null, $absoluteY=null)
@@ -168,11 +177,11 @@ class Varien_File_Uploader_Image extends Varien_File_Uploader
      *
      * Value is an integer in pixels, or a string which format can be in pixels or percentage.
      * For instance, values can be : 40, '40', '40px' or '40%'
-     *     
+     *
      * $space sets the space between the source image and its relection
      *
      * Value is an integer in pixels, which can be negative
-     *     
+     *
      * $color sets the color of the reflection background.
      *
      * Value is an hexadecimal color, such as #FFFFFF
@@ -180,14 +189,14 @@ class Varien_File_Uploader_Image extends Varien_File_Uploader
      * $opacity sets the initial opacity of the reflection
      *
      * Value is an integer between 0 (no opacity) and 100 (full opacity).
-     *     
+     *
      */
     public function addReflection($height="10%", $space=0, $color="#FFFFFF", $opacity=60)
     {
         if( intval($height) == 0 ) {
             return;
         }
-        
+
         $this->uploader->image_reflection_height = $height;
         $this->uploader->image_reflection_space = $space;
         $this->uploader->image_reflection_color = $color;
@@ -353,13 +362,8 @@ class Varien_File_Uploader_Image extends Varien_File_Uploader
     {
         $this->uploader->image_background_color = $color;
     }
-
-    function __destruct()
-    {
-        $this->uploader->Clean();
-    }
 }
- 
+
 // ft:php
 // fileformat:unix
 // tabstop:4

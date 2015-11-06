@@ -9,17 +9,17 @@
  * http://opensource.org/licenses/afl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to license@magentocommerce.com so we can send you a copy immediately.
+ * to license@magento.com so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade Magento to newer
  * versions in the future. If you wish to customize Magento for your
- * needs please refer to http://www.magentocommerce.com for more information.
+ * needs please refer to http://www.magento.com for more information.
  *
  * @category    Mage
  * @package     js
- * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
+ * @copyright   Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
  * @license     http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
  */
 
@@ -32,7 +32,7 @@ TranslateInline.prototype = {
         this.trigTimer = null;
         this.trigContentEl = null;
         if (Prototype.Browser.IE) {
-            $$('*[translate]').each(this.initializeElement.bind(this));
+            $$('*[data-translate]').each(this.initializeElement.bind(this));
             var scope = this;
             Ajax.Responders.register({ onComplete: function() {
                 window.setTimeout(scope.reinitElements.bind(scope), 50)
@@ -42,7 +42,7 @@ TranslateInline.prototype = {
             var ElementUpdate = ElementNode.prototype.update;
             ElementNode.prototype.update = function() {
                 ElementUpdate.apply(this, arguments);
-                $(this).select('*[translate]').each(scope.initializeElement.bind(scope));
+                $(this).select('*[data-translate]').each(scope.initializeElement.bind(scope));
             }
         }
         this.trigEl = $(trigEl);
@@ -50,11 +50,11 @@ TranslateInline.prototype = {
 
         Event.observe(document.body, 'mousemove', function(e) {
             var target = Event.element(e);
-            if (!$(target).match('*[translate]')) {
-                target = target.up('*[translate]');
+            if (!$(target).match('*[data-translate]')) {
+                target = target.up('*[data-translate]');
             }
 
-            if (target && $(target).match('*[translate]')) {
+            if (target && $(target).match('*[data-translate]')) {
                 this.trigShow(target, e);
             } else {
                 if (Event.element(e).match('#' + trigEl)) {
@@ -76,7 +76,7 @@ TranslateInline.prototype = {
     },
 
     reinitElements: function(el) {
-        $$('*[translate]').each(this.initializeElement.bind(this));
+        $$('*[data-translate]').each(this.initializeElement.bind(this));
     },
 
     trigShow: function(el, event) {
@@ -120,7 +120,7 @@ TranslateInline.prototype = {
             return;
         }
         this.trigHideClear();
-        eval('var data = ' + el.getAttribute('translate'));
+        eval('var data = ' + el.getAttribute('data-translate'));
 
         var content = '<form id="translate-inline-form">';
         var t = new Template(

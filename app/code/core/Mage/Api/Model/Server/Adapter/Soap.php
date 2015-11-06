@@ -10,18 +10,18 @@
  * http://opensource.org/licenses/osl-3.0.php
  * If you did not receive a copy of the license and are unable to
  * obtain it through the world-wide-web, please send an email
- * to license@magentocommerce.com so we can send you a copy immediately.
+ * to license@magento.com so we can send you a copy immediately.
  *
  * DISCLAIMER
  *
  * Do not edit or add to this file if you wish to upgrade Magento to newer
  * versions in the future. If you wish to customize Magento for your
- * needs please refer to http://www.magentocommerce.com for more information.
+ * needs please refer to http://www.magento.com for more information.
  *
  * @category    Mage
  * @package     Mage_Api
- * @copyright   Copyright (c) 2013 Magento Inc. (http://www.magentocommerce.com)
- * @license     http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ * @copyright  Copyright (c) 2006-2015 X.commerce, Inc. (http://www.magento.com)
+ * @license    http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  */
 
 /**
@@ -36,11 +36,45 @@ class Mage_Api_Model_Server_Adapter_Soap
     implements Mage_Api_Model_Server_Adapter_Interface
 {
     /**
+     * Wsdl config
+     *
+     * @var Varien_Object
+     */
+    protected $wsdlConfig = null;
+
+    /**
      * Soap server
      *
      * @var SoapServer
      */
     protected $_soap = null;
+
+    /**
+     * Internal constructor
+     */
+    protected function _construct()
+    {
+        $this->wsdlConfig = $this->_getWsdlConfig();
+    }
+
+    /**
+     * Get wsdl config
+     *
+     * @return Varien_Object
+     */
+    protected function _getWsdlConfig()
+    {
+        $wsdlConfig = new Varien_Object();
+        $queryParams = $this->getController()->getRequest()->getQuery();
+        if (isset($queryParams['wsdl'])) {
+            unset($queryParams['wsdl']);
+        }
+
+        $wsdlConfig->setUrl(htmlspecialchars(Mage::getUrl('*/*/*', array('_query'=>$queryParams))));
+        $wsdlConfig->setName('Magento');
+        $wsdlConfig->setHandler($this->getHandler());
+        return $wsdlConfig;
+    }
 
     /**
      * Set handler class name for webservice
@@ -114,17 +148,7 @@ class Mage_Api_Model_Server_Adapter_Soap
 
             $template = Mage::getModel('core/email_template_filter');
 
-            $wsdlConfig = new Varien_Object();
-            $queryParams = $this->getController()->getRequest()->getQuery();
-            if (isset($queryParams['wsdl'])) {
-                unset($queryParams['wsdl']);
-            }
-
-            $wsdlConfig->setUrl(htmlspecialchars(Mage::getUrl('*/*/*', array('_query'=>$queryParams))));
-            $wsdlConfig->setName('Magento');
-            $wsdlConfig->setHandler($this->getHandler());
-
-            $template->setVariables(array('wsdl' => $wsdlConfig));
+            $template->setVariables(array('wsdl' => $this->wsdlConfig));
 
             $this->getController()->getResponse()
                 ->clearHeaders()
@@ -209,9 +233,9 @@ class Mage_Api_Model_Server_Adapter_Soap
             : $urlModel->getUrl('*/*/*');
 
         if ( $withAuth ) {
-            $phpAuthUser = $this->getController()->getRequest()->getServer('PHP_AUTH_USER', false);
-            $phpAuthPw = $this->getController()->getRequest()->getServer('PHP_AUTH_PW', false);
-            $scheme = $this->getController()->getRequest()->getScheme();
+            $phpAuthUser = rawurlencode($this->getController()->getRequest()->getServer('PHP_AUTH_USER', false));
+            $phpAuthPw = rawurlencode($this->getController()->getRequest()->getServer('PHP_AUTH_PW', false));
+            $scheme = rawurlencode($this->getController()->getRequest()->getScheme());
 
             if ($phpAuthUser && $phpAuthPw) {
                 $wsdlUrl = sprintf("%s://%s:%s@%s", $scheme, $phpAuthUser, $phpAuthPw,
